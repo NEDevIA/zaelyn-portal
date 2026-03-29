@@ -3,24 +3,22 @@
 import { useState, useEffect, useRef } from "react";
 
 type Chip = { color: string; module: string; detail: string };
-type Turn = { role: "user" | "zaelyn"; text: string; chips?: Chip[]; phantomBadge?: boolean };
+type Turn = { role: "user" | "zaelyn"; text: string; chips?: Chip[]; phantom?: boolean };
 type Conversation = { id: number; turns: Turn[] };
 
+/* ── 5 ejemplos cotidianos — uno por módulo + uno combinado ── */
 const CONVERSATIONS: Conversation[] = [
   {
     id: 1,
     turns: [
       {
         role: "user",
-        text: "anota en mi diario: hoy resolvi los bugs de Zaelyn. Y conoce a Roberto Sanchez, inversionista en Monterrey, le intereso mucho el proyecto.",
+        text: "Anota en mi diario: hoy me peleé con mi pareja pero al final terminamos riendo. Fue un día raro pero bonito.",
       },
       {
         role: "zaelyn",
-        text: "Hecho. Un dia que merece estar en tu historia — los bugs que resolviste hoy son lo que hace que todo lo demas funcione. Roberto Sanchez quedo guardado con el contexto de Zaelyn y Monterrey.",
-        chips: [
-          { color: "#8b5cf6", module: "Mira", detail: "entrada guardada" },
-          { color: "#7c3aed", module: "Sirius", detail: "Roberto Sanchez" },
-        ],
+        text: "Guardado. Esos días raros que terminan bien son los que más valen. Ahí va en tu historia.",
+        chips: [{ color: "#8b5cf6", module: "Mira", detail: "entrada guardada" }],
       },
     ],
   },
@@ -29,14 +27,12 @@ const CONVERSATIONS: Conversation[] = [
     turns: [
       {
         role: "user",
-        text: "quiero lanzar Zaelyn con 50 usuarios beta este trimestre",
+        text: "Recuérdame comprar el pastel de cumpleaños de mi mamá el viernes a las 5pm.",
       },
       {
         role: "zaelyn",
-        text: "Meta registrada. Voy a ir conectando lo que hagas en Orion con este objetivo para que puedas ver que porcentaje de tu semana va realmente hacia esto. El 25 de junio es tu fecha.",
-        chips: [
-          { color: "#10b981", module: "Polaris", detail: "meta activa · 25 jun" },
-        ],
+        text: "Anotado. El viernes a las 5pm te aviso para el pastel. Tu mamá se va a poner feliz.",
+        chips: [{ color: "#3b82f6", module: "Orion", detail: "viernes · 5:00 pm" }],
       },
     ],
   },
@@ -45,224 +41,297 @@ const CONVERSATIONS: Conversation[] = [
     turns: [
       {
         role: "user",
-        text: "cuales son mis opciones para la arquitectura de privacidad sin que quede guardado?",
-        phantomBadge: true,
+        text: "Conocí a Carlos Mendoza, médico en Guadalajara. Le interesa mucho la salud mental digital.",
       },
       {
         role: "zaelyn",
-        text: "En este modo no guardo nada de esta conversacion. Al cerrar el tab, desaparece. Para la arquitectura: tienes tres capas — politica contractual, token anonimo verificable, y modelo local con Ollama si quieres la capa criptografica completa.",
+        text: "Carlos Mendoza guardado con contexto completo. La próxima vez que hables de salud mental, lo voy a conectar.",
+        chips: [{ color: "#7c3aed", module: "Sirius", detail: "Carlos Mendoza" }],
+      },
+    ],
+  },
+  {
+    id: 4,
+    turns: [
+      {
+        role: "user",
+        text: "Quiero ahorrar 3,000 pesos al mes durante 6 meses. Empieza a registrar desde hoy.",
+      },
+      {
+        role: "zaelyn",
+        text: "Meta activa. 3,000 al mes por 6 meses: 18,000 en total. Te voy ayudando a ver cómo vas cada semana.",
+        chips: [{ color: "#10b981", module: "Polaris", detail: "meta activa · 6 meses" }],
+      },
+    ],
+  },
+  {
+    id: 5,
+    turns: [
+      {
+        role: "user",
+        text: "Hoy fui al gym por primera vez en semanas. Conocí a un entrenador buenísimo que se llama Diego. Quiero ir mínimo 3 veces por semana.",
+      },
+      {
+        role: "zaelyn",
+        text: "Qué buen día para volver. Diego guardado como contacto. La meta de 3 veces por semana ya está activa, y tu diario de hoy marca el regreso.",
+        chips: [
+          { color: "#8b5cf6", module: "Mira", detail: "entrada guardada" },
+          { color: "#7c3aed", module: "Sirius", detail: "Diego — entrenador" },
+          { color: "#10b981", module: "Polaris", detail: "meta activa" },
+        ],
       },
     ],
   },
 ];
 
-const CHAR_DELAY = 28; // ms por caracter
-const PAUSE_AFTER = 5800; // ms antes de rotar
+const CHAR_DELAY  = 22;   // ms por caracter
+const PAUSE_AFTER = 5500; // ms de pausa al terminar
+const FADE_MS     = 320;  // ms de fade entre conversaciones
 
 export default function DemoWindow() {
-  const [convIndex, setConvIndex] = useState(0);
-  const [displayedText, setDisplayedText] = useState("");
-  const [showChips, setShowChips] = useState(false);
-  const [phase, setPhase] = useState<"user" | "typing" | "done" | "fading">("user");
-  const [visible, setVisible] = useState(true);
+  const [convIdx, setConvIdx]         = useState(0);
+  const [typed, setTyped]             = useState("");
+  const [showChips, setShowChips]     = useState(false);
+  const [phase, setPhase]             = useState<"user" | "typing" | "done">("user");
+  const [contentVisible, setContentVisible] = useState(true);
+
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clear = () => { if (timerRef.current) clearTimeout(timerRef.current); };
 
-  const conv = CONVERSATIONS[convIndex];
-  const userTurn = conv.turns[0];
-  const aiTurn = conv.turns[1];
+  const conv    = CONVERSATIONS[convIdx];
+  const userMsg = conv.turns[0];
+  const aiMsg   = conv.turns[1];
 
-  function clearTimer() {
-    if (timerRef.current) clearTimeout(timerRef.current);
-  }
-
+  /* ── Resetear al cambiar conversación ── */
   useEffect(() => {
-    setVisible(true);
     setPhase("user");
-    setDisplayedText("");
+    setTyped("");
     setShowChips(false);
+    clear();
+    timerRef.current = setTimeout(() => setPhase("typing"), 900);
+    return clear;
+  }, [convIdx]);
 
-    // Mostrar mensaje del usuario → luego typewriter Zaelyn
-    clearTimer();
-    timerRef.current = setTimeout(() => {
-      setPhase("typing");
-    }, 900);
-
-    return () => clearTimer();
-  }, [convIndex]);
-
+  /* ── Typewriter ── */
   useEffect(() => {
     if (phase !== "typing") return;
-    const fullText = aiTurn.text;
+    const full = aiMsg.text;
     let i = 0;
-    setDisplayedText("");
+    setTyped("");
 
-    function typeNext() {
+    function next() {
       i++;
-      setDisplayedText(fullText.slice(0, i));
-      if (i < fullText.length) {
-        timerRef.current = setTimeout(typeNext, CHAR_DELAY);
+      setTyped(full.slice(0, i));
+      if (i < full.length) {
+        timerRef.current = setTimeout(next, CHAR_DELAY);
       } else {
-        // Typing done — show chips then wait
         timerRef.current = setTimeout(() => {
           setShowChips(true);
           setPhase("done");
-        }, 200);
+        }, 180);
       }
     }
-    timerRef.current = setTimeout(typeNext, CHAR_DELAY);
-    return () => clearTimer();
-  }, [phase, aiTurn.text]);
+    timerRef.current = setTimeout(next, CHAR_DELAY);
+    return clear;
+  }, [phase, aiMsg.text]);
 
+  /* ── Auto-loop: fade content → next conv → fade in ── */
   useEffect(() => {
     if (phase !== "done") return;
     timerRef.current = setTimeout(() => {
-      setPhase("fading");
-      setVisible(false);
+      // Fade out content
+      setContentVisible(false);
       timerRef.current = setTimeout(() => {
-        setConvIndex((prev) => (prev + 1) % CONVERSATIONS.length);
-      }, 400);
+        // Advance to next conversation
+        setConvIdx(prev => (prev + 1) % CONVERSATIONS.length);
+        // Fade back in immediately after state reset
+        timerRef.current = setTimeout(() => setContentVisible(true), 50);
+      }, FADE_MS);
     }, PAUSE_AFTER);
-    return () => clearTimer();
+    return clear;
   }, [phase]);
 
   return (
-    <section id="demo" className="py-24 px-6" style={{ background: "#080a0d" }}>
+    <section
+      id="demo"
+      className="py-28 px-6"
+      style={{ background: "var(--background)" }}
+    >
       <div className="max-w-[1400px] mx-auto">
-        {/* Header de sección */}
-        <div className="flex flex-col gap-2 mb-12">
-          <p className="text-[11px] font-medium tracking-widest uppercase" style={{ color: "rgba(226,228,233,0.25)" }}>
-            Como funciona
+
+        {/* Header */}
+        <div className="flex flex-col gap-3 mb-14 text-center">
+          <p
+            className="text-[12px] font-medium tracking-widest uppercase"
+            style={{ color: "var(--muted-foreground)" }}
+          >
+            Cómo funciona
           </p>
-          <h2 className="text-2xl md:text-3xl font-medium tracking-tight" style={{ color: "#e2e4e9", fontFamily: "var(--font-dm-sans)" }}>
-            Una conversacion cambia todo.
+          <h2
+            className="text-3xl md:text-4xl font-medium tracking-tight"
+            style={{ color: "var(--foreground)", fontFamily: "var(--font-dm-sans)" }}
+          >
+            Una conversación cambia todo.
           </h2>
+          <p
+            className="text-base max-w-[48ch] mx-auto"
+            style={{ color: "var(--muted-foreground)" }}
+          >
+            Habla normal. Zaelyn entiende lo que quieres decir y lo organiza solo.
+          </p>
         </div>
 
-        {/* Ventana de demo */}
-        <div className="max-w-[640px]">
+        {/* Ventana de demo — centrada */}
+        <div className="max-w-[680px] mx-auto">
           <div
-            className="rounded-2xl overflow-hidden transition-opacity duration-400"
+            className="rounded-2xl overflow-hidden"
             style={{
-              background: "#0f1115",
-              border: "1px solid rgba(255,255,255,0.06)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
-              opacity: visible ? 1 : 0,
-              transition: "opacity 0.4s ease",
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 4px 32px rgba(0,0,0,0.12)",
             }}
           >
             {/* Titlebar */}
             <div
-              className="flex items-center gap-2.5 px-4 py-3"
-              style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}
+              className="flex items-center gap-2.5 px-5 py-3.5"
+              style={{ borderBottom: "1px solid var(--border)" }}
             >
               <div className="flex gap-1.5">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: "#2a2a2a" }} />
+                {["#ff5f57", "#febc2e", "#28c840"].map((c, i) => (
+                  <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c, opacity: 0.7 }} />
                 ))}
               </div>
-              <span className="text-[11px] ml-1" style={{ color: "rgba(255,255,255,0.2)" }}>
+              <span className="text-[11px] ml-2" style={{ color: "var(--muted-foreground)", opacity: 0.6 }}>
                 zaelyn.ai · chat
               </span>
-              {conv.id === 3 && (
-                <span
-                  className="ml-auto flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
-                  style={{
-                    background: "rgba(139,92,246,0.1)",
-                    border: "1px solid rgba(139,92,246,0.2)",
-                    color: "#a78bfa",
-                  }}
-                >
-                  Phantom activo
-                </span>
-              )}
+              {/* Módulo badge */}
+              <span
+                className="ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full"
+                style={{
+                  background: "rgba(99,102,241,0.1)",
+                  color: "#818cf8",
+                  border: "1px solid rgba(99,102,241,0.2)",
+                }}
+              >
+                {conv.turns[1].chips?.[0]?.module ?? "Zaelyn"}
+              </span>
             </div>
 
-            {/* Chat content */}
-            <div className="px-5 py-5 min-h-[220px] flex flex-col gap-4">
+            {/* Content — fade in/out */}
+            <div
+              className="px-6 py-6 flex flex-col gap-5"
+              style={{
+                minHeight: "240px",
+                opacity: contentVisible ? 1 : 0,
+                transition: `opacity ${FADE_MS}ms ease`,
+              }}
+            >
               {/* User message */}
               <div className="flex justify-end">
-                <p
-                  className="text-[12px] italic font-light max-w-[85%] text-right leading-relaxed"
+                <div
+                  className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tr-sm text-right"
                   style={{
-                    color: "rgba(226,228,233,0.35)",
-                    fontFamily: "var(--font-dm-sans)",
+                    background: "rgba(99,102,241,0.1)",
+                    border: "1px solid rgba(99,102,241,0.18)",
                   }}
                 >
-                  {userTurn.text}
-                </p>
+                  <p
+                    className="text-[14px] leading-relaxed"
+                    style={{
+                      color: "var(--muted-foreground)",
+                      fontFamily: "var(--font-dm-sans)",
+                    }}
+                  >
+                    {userMsg.text}
+                  </p>
+                </div>
               </div>
 
               {/* Zaelyn response */}
-              {(phase === "typing" || phase === "done" || phase === "fading") && (
-                <div className="flex flex-col gap-3">
-                  <p
-                    className="text-[15px] leading-relaxed"
+              {(phase === "typing" || phase === "done") && (
+                <div className="flex gap-3 items-start">
+                  {/* Avatar */}
+                  <div
+                    className="w-7 h-7 rounded-full flex-shrink-0 mt-0.5 flex items-center justify-center text-[10px] font-medium"
                     style={{
-                      color: "#e2e4e9",
-                      fontFamily: "var(--font-dm-serif)",
+                      background: "rgba(139,92,246,0.15)",
+                      border: "1px solid rgba(139,92,246,0.25)",
+                      color: "#a78bfa",
                     }}
                   >
-                    {displayedText}
-                    {phase === "typing" && (
-                      <span className="cursor-blink" />
-                    )}
-                  </p>
+                    Z
+                  </div>
 
-                  {/* Chips */}
-                  {showChips && aiTurn.chips && aiTurn.chips.length > 0 && (
-                    <div
-                      className="flex flex-wrap gap-1.5 fade-in-up"
+                  <div className="flex flex-col gap-3 flex-1">
+                    <p
+                      className="text-[16px] leading-relaxed"
+                      style={{
+                        color: "var(--foreground)",
+                        fontFamily: "var(--font-dm-serif)",
+                      }}
                     >
-                      {aiTurn.chips.map((chip, i) => (
-                        <span
-                          key={i}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
-                          style={{
-                            background: `${chip.color}14`,
-                            border: `1px solid ${chip.color}28`,
-                            color: chip.color,
-                          }}
-                        >
-                          <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: chip.color }} />
-                          {chip.module}
-                          <span style={{ color: `${chip.color}80` }}> — {chip.detail}</span>
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                      {typed}
+                      {phase === "typing" && <span className="cursor-blink" />}
+                    </p>
+
+                    {/* Module chips */}
+                    {showChips && aiMsg.chips && aiMsg.chips.length > 0 && (
+                      <div className="flex flex-wrap gap-2 fade-in-up">
+                        {aiMsg.chips.map((chip, i) => (
+                          <span
+                            key={i}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                            style={{
+                              background: `${chip.color}18`,
+                              border: `1px solid ${chip.color}35`,
+                              color: chip.color,
+                            }}
+                          >
+                            <span
+                              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                              style={{ background: chip.color }}
+                            />
+                            {chip.module}
+                            <span style={{ color: `${chip.color}90` }}>— {chip.detail}</span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
-
-              {/* Phantom footer note */}
-              {conv.id === 3 && phase === "done" && (
-                <p
-                  className="text-[10px] text-center mt-2 fade-in-up"
-                  style={{ color: "rgba(255,255,255,0.15)" }}
-                >
-                  Phantom Mode activo — esta sesion no existe en ningun servidor
-                </p>
-              )}
             </div>
 
-            {/* Dots de progreso */}
+            {/* Progress dots */}
             <div
-              className="flex justify-center gap-1.5 pb-4"
+              className="flex justify-center gap-2 pb-5"
+              style={{ borderTop: "1px solid var(--border)" }}
             >
-              {CONVERSATIONS.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => { clearTimer(); setConvIndex(i); }}
-                  className="rounded-full transition-all duration-300"
-                  style={{
-                    width: i === convIndex ? "16px" : "6px",
-                    height: "6px",
-                    background: i === convIndex ? "#6366f1" : "rgba(255,255,255,0.12)",
-                  }}
-                  aria-label={`Conversacion ${i + 1}`}
-                />
-              ))}
+              <div className="flex gap-2 pt-4">
+                {CONVERSATIONS.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { clear(); setContentVisible(false); setTimeout(() => { setConvIdx(i); setContentVisible(true); }, FADE_MS); }}
+                    className="rounded-full transition-all duration-300"
+                    style={{
+                      width: i === convIdx ? "20px" : "6px",
+                      height: "6px",
+                      background: i === convIdx ? "#6366f1" : "var(--border)",
+                    }}
+                    aria-label={`Ejemplo ${i + 1}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
+
+          {/* Caption debajo */}
+          <p
+            className="text-center text-[12px] mt-4"
+            style={{ color: "var(--muted-foreground)", opacity: 0.6 }}
+          >
+            Diario · Recordatorios · Memoria · Metas — todo en una sola conversación
+          </p>
         </div>
       </div>
     </section>

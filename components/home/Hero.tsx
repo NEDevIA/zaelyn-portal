@@ -5,7 +5,7 @@ import { ArrowRight } from "@phosphor-icons/react";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-[100dvh] flex items-center overflow-hidden" style={{ background: "#080a0d" }}>
+    <section className="relative min-h-[100dvh] flex items-center overflow-hidden" style={{ background: "var(--background)" }}>
       {/* Ambient glow — sin neon, sutil */}
       <div
         className="absolute top-0 left-1/3 w-[600px] h-[600px] rounded-full pointer-events-none"
@@ -40,17 +40,17 @@ export default function Hero() {
             <div className="flex flex-col gap-3">
               <h1
                 className="text-4xl md:text-6xl font-medium tracking-tight leading-none"
-                style={{ color: "#e2e4e9", fontFamily: "var(--font-dm-sans)" }}
+                style={{ color: "var(--foreground)", fontFamily: "var(--font-dm-sans)" }}
               >
                 La IA con la que hablas
                 <br />
-                <span style={{ color: "rgba(226,228,233,0.45)" }}>
+                <span style={{ color: "var(--muted-foreground)" }}>
                   te conoce de verdad.
                 </span>
               </h1>
               <p
                 className="text-base leading-relaxed max-w-[52ch]"
-                style={{ color: "rgba(226,228,233,0.5)", fontFamily: "var(--font-dm-sans)" }}
+                style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-dm-sans)" }}
               >
                 Zaelyn recuerda lo que importa, conecta tus ideas
                 y crece contigo.
@@ -97,9 +97,9 @@ export default function Hero() {
             <div
               className="relative rounded-2xl overflow-hidden"
               style={{
-                background: "rgba(15,17,21,0.8)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
+                background: "var(--card)",
+                border: "1px solid var(--border)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 4px 32px rgba(0,0,0,0.08)",
                 backdropFilter: "blur(16px)",
               }}
             >

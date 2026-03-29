@@ -44,9 +44,28 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`dark ${dmSans.variable} ${dmSerif.variable} ${dmMono.variable}`}
+      className={`${dmSans.variable} ${dmSerif.variable} ${dmMono.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Apply theme before paint to avoid flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var t = localStorage.getItem('zaelyn-theme');
+                if (t === 'light') {
+                  document.documentElement.classList.remove('dark');
+                } else {
+                  document.documentElement.classList.add('dark');
+                }
+              } catch(e) {
+                document.documentElement.classList.add('dark');
+              }
+            `,
+          }}
+        />
+      </head>
       <body>{children}</body>
     </html>
   );
