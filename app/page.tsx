@@ -1,6 +1,7 @@
 import Nav from "@/components/home/Nav";
 import Hero from "@/components/home/Hero";
 import DemoWindow from "@/components/home/DemoWindow";
+import PersonaSection from "@/components/home/PersonaSection";
 import PrivacySection from "@/components/home/PrivacySection";
 import ModulesSection from "@/components/home/ModulesSection";
 import ChannelsSection from "@/components/home/ChannelsSection";
@@ -14,6 +15,7 @@ export default function LandingPage() {
       <Nav />
       <Hero />
       <DemoWindow />
+      <PersonaSection />
       <PrivacySection />
       <ModulesSection />
       <ChannelsSection />
