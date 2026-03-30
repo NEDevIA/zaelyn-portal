@@ -1,0 +1,92 @@
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "wss://ne-botios-staging.fly.dev";
+
+export type WSServerMessage =
+  | { type: "text_chunk"; content: string }
+  | { type: "text_done" }
+  | { type: "module_saved"; module: string; itemType: string; summary: string; id: string }
+  | { type: "phantom_expired" }
+  | { type: "entity_detected"; entities: unknown[] }
+  | { type: "error"; code: string; message: string }
+  | { type: "ping" };
+
+export type WSClientMessage =
+  | { type: "message"; content: string; conversationId?: string; anonToken?: string }
+  | { type: "pong" };
+
+type MessageHandler = (msg: WSServerMessage) => void;
+type StatusHandler = (status: "connected" | "disconnected" | "reconnecting") => void;
+
+export class ZaelynWS {
+  private ws: WebSocket | null = null;
+  private token: string;
+  private onMessage: MessageHandler;
+  private onStatus: StatusHandler;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private reconnectDelay = 2000;
+  private destroyed = false;
+
+  constructor(token: string, onMessage: MessageHandler, onStatus: StatusHandler) {
+    this.token = token;
+    this.onMessage = onMessage;
+    this.onStatus = onStatus;
+    this.connect();
+  }
+
+  private connect() {
+    if (this.destroyed) return;
+    try {
+      this.ws = new WebSocket(`${WS_URL}?token=${encodeURIComponent(this.token)}`);
+
+      this.ws.onopen = () => {
+        this.reconnectDelay = 2000;
+        this.onStatus("connected");
+      };
+
+      this.ws.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data) as WSServerMessage;
+          if (msg.type === "ping") {
+            this.send({ type: "pong" });
+            return;
+          }
+          this.onMessage(msg);
+        } catch { /* ignore malformed messages */ }
+      };
+
+      this.ws.onerror = () => { /* handled by onclose */ };
+
+      this.ws.onclose = () => {
+        if (this.destroyed) return;
+        this.onStatus("reconnecting");
+        this.reconnectTimer = setTimeout(() => {
+          this.reconnectDelay = Math.min(this.reconnectDelay * 1.5, 30000);
+          this.connect();
+        }, this.reconnectDelay);
+      };
+    } catch {
+      this.onStatus("disconnected");
+    }
+  }
+
+  send(msg: WSClientMessage) {
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify(msg));
+    }
+  }
+
+  sendMessage(content: string, conversationId?: string, anonToken?: string) {
+    this.send({
+      type: "message",
+      content,
+      ...(conversationId ? { conversationId } : {}),
+      ...(anonToken ? { anonToken } : {}),
+    });
+  }
+
+  destroy() {
+    this.destroyed = true;
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+    this.ws?.close();
+    this.ws = null;
+  }
+}
