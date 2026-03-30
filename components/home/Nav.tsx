@@ -39,7 +39,7 @@ export default function Nav() {
       <div className="max-w-[1400px] mx-auto px-6 h-14 flex items-center justify-between">
         {/* Logo — solo "ae" resaltado */}
         <Link href="/" className="flex items-center gap-1.5 group">
-          <span className="text-[16px] font-medium tracking-tight dark:text-white/90 text-gray-900">
+          <span className="text-[22px] font-medium tracking-tight dark:text-white/90 text-gray-900">
             Z<span style={{ color: "#8b5cf6" }}>ae</span>lyn
           </span>
         </Link>

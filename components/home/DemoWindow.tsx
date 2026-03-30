@@ -3,153 +3,121 @@
 import { useState, useEffect, useRef } from "react";
 
 type Chip = { color: string; module: string; detail: string };
-type Turn = { role: "user" | "zaelyn"; text: string; chips?: Chip[]; phantom?: boolean };
-type Conversation = { id: number; turns: Turn[] };
+type Conversation = {
+  id: number;
+  user: string;
+  ai: string;
+  chips?: Chip[];
+  phantom?: boolean;
+};
 
-/* ── 5 ejemplos cotidianos — uno por módulo + uno combinado ── */
 const CONVERSATIONS: Conversation[] = [
   {
     id: 1,
-    turns: [
-      {
-        role: "user",
-        text: "Anota en mi diario: hoy me peleé con mi pareja pero al final terminamos riendo. Fue un día raro pero bonito.",
-      },
-      {
-        role: "zaelyn",
-        text: "Guardado. Esos días raros que terminan bien son los que más valen. Ahí va en tu historia.",
-        chips: [{ color: "#8b5cf6", module: "Mira", detail: "entrada guardada" }],
-      },
-    ],
+    user: "Anota en mi diario: hoy me peleé con mi pareja pero al final terminamos riendo. Fue un día raro pero bonito.",
+    ai: "Guardado. Esos días raros que terminan bien son los que más valen. Ahí va en tu historia.",
+    chips: [{ color: "#8b5cf6", module: "Mira", detail: "entrada guardada" }],
   },
   {
     id: 2,
-    turns: [
-      {
-        role: "user",
-        text: "Recuérdame comprar el pastel de cumpleaños de mi mamá el viernes a las 5pm.",
-      },
-      {
-        role: "zaelyn",
-        text: "Anotado. El viernes a las 5pm te aviso para el pastel. Tu mamá se va a poner feliz.",
-        chips: [{ color: "#3b82f6", module: "Orion", detail: "viernes · 5:00 pm" }],
-      },
-    ],
+    user: "Recuérdame comprar el pastel de cumpleaños de mi mamá el viernes a las 5pm.",
+    ai: "Listo. El viernes a las 5pm te aviso para el pastel. Tu mamá se va a poner feliz.",
+    chips: [{ color: "#3b82f6", module: "Orion", detail: "viernes · 5:00 pm" }],
   },
   {
     id: 3,
-    turns: [
-      {
-        role: "user",
-        text: "Conocí a Carlos Mendoza, médico en Guadalajara. Le interesa mucho la salud mental digital.",
-      },
-      {
-        role: "zaelyn",
-        text: "Carlos Mendoza guardado con contexto completo. La próxima vez que hables de salud mental, lo voy a conectar.",
-        chips: [{ color: "#7c3aed", module: "Sirius", detail: "Carlos Mendoza" }],
-      },
-    ],
+    user: "Conocí a Carlos Mendoza, médico en Guadalajara. Le interesa mucho la salud mental digital.",
+    ai: "Carlos Mendoza guardado con contexto. Médico, Guadalajara, salud mental digital. Lo voy a conectar cuando sea relevante.",
+    chips: [{ color: "#7c3aed", module: "Sirius", detail: "Carlos Mendoza" }],
   },
   {
     id: 4,
-    turns: [
-      {
-        role: "user",
-        text: "Quiero ahorrar 3,000 pesos al mes durante 6 meses. Empieza a registrar desde hoy.",
-      },
-      {
-        role: "zaelyn",
-        text: "Meta activa. 3,000 al mes por 6 meses: 18,000 en total. Te voy ayudando a ver cómo vas cada semana.",
-        chips: [{ color: "#10b981", module: "Polaris", detail: "meta activa · 6 meses" }],
-      },
-    ],
+    user: "Quiero ahorrar 3,000 pesos al mes durante 6 meses. Empieza a registrar desde hoy.",
+    ai: "Meta activa. 3,000 al mes por 6 meses: 18,000 en total. Cada semana te ayudo a ver cómo vas.",
+    chips: [{ color: "#10b981", module: "Polaris", detail: "meta activa · 6 meses" }],
   },
   {
     id: 5,
-    turns: [
-      {
-        role: "user",
-        text: "Hoy fui al gym por primera vez en semanas. Conocí a un entrenador buenísimo que se llama Diego. Quiero ir mínimo 3 veces por semana.",
-      },
-      {
-        role: "zaelyn",
-        text: "Qué buen día para volver. Diego guardado como contacto. La meta de 3 veces por semana ya está activa, y tu diario de hoy marca el regreso.",
-        chips: [
-          { color: "#8b5cf6", module: "Mira", detail: "entrada guardada" },
-          { color: "#7c3aed", module: "Sirius", detail: "Diego — entrenador" },
-          { color: "#10b981", module: "Polaris", detail: "meta activa" },
-        ],
-      },
+    user: "Hoy fui al gym por primera vez en semanas. Conocí a un entrenador buenísimo que se llama Diego. Quiero ir mínimo 3 veces por semana.",
+    ai: "Qué buen día para volver. Diego guardado. La meta de 3 veces por semana ya está activa, y tu diario de hoy marca el regreso.",
+    chips: [
+      { color: "#8b5cf6", module: "Mira", detail: "entrada guardada" },
+      { color: "#7c3aed", module: "Sirius", detail: "Diego — entrenador" },
+      { color: "#10b981", module: "Polaris", detail: "meta activa" },
     ],
   },
 ];
 
-const CHAR_DELAY  = 22;   // ms por caracter
-const PAUSE_AFTER = 5500; // ms de pausa al terminar
-const FADE_MS     = 320;  // ms de fade entre conversaciones
+const CHAR_DELAY  = 20;
+const PAUSE_AFTER = 5000;
+const FADE_MS     = 280;
+
+function delay(ms: number) {
+  return new Promise<void>(resolve => setTimeout(resolve, ms));
+}
 
 export default function DemoWindow() {
-  const [convIdx, setConvIdx]         = useState(0);
-  const [typed, setTyped]             = useState("");
-  const [showChips, setShowChips]     = useState(false);
-  const [phase, setPhase]             = useState<"user" | "typing" | "done">("user");
+  const [convIdx, setConvIdx]           = useState(0);
+  const [typed, setTyped]               = useState("");
+  const [showChips, setShowChips]       = useState(false);
+  const [showAI, setShowAI]             = useState(false);
   const [contentVisible, setContentVisible] = useState(true);
+  const cancelRef = useRef(false);
 
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const clear = () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  const conv = CONVERSATIONS[convIdx];
 
-  const conv    = CONVERSATIONS[convIdx];
-  const userMsg = conv.turns[0];
-  const aiMsg   = conv.turns[1];
-
-  /* ── Resetear al cambiar conversación ── */
+  /* ── Lanzar secuencia limpia por cada conversación ── */
   useEffect(() => {
-    setPhase("user");
-    setTyped("");
-    setShowChips(false);
-    clear();
-    timerRef.current = setTimeout(() => setPhase("typing"), 900);
-    return clear;
+    cancelRef.current = false;
+
+    async function run() {
+      // Reset
+      setTyped("");
+      setShowChips(false);
+      setShowAI(false);
+      setContentVisible(true);
+
+      await delay(700);
+      if (cancelRef.current) return;
+
+      // Mostrar AI bubble
+      setShowAI(true);
+
+      // Typewriter
+      const text = CONVERSATIONS[convIdx].ai;
+      for (let i = 1; i <= text.length; i++) {
+        if (cancelRef.current) return;
+        setTyped(text.slice(0, i));
+        await delay(CHAR_DELAY);
+      }
+
+      if (cancelRef.current) return;
+      await delay(200);
+      setShowChips(true);
+
+      // Espera antes de rotar
+      await delay(PAUSE_AFTER);
+      if (cancelRef.current) return;
+
+      // Fade out
+      setContentVisible(false);
+      await delay(FADE_MS);
+      if (cancelRef.current) return;
+
+      // Siguiente conversación
+      setConvIdx(prev => (prev + 1) % CONVERSATIONS.length);
+    }
+
+    run();
+
+    return () => { cancelRef.current = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [convIdx]);
 
-  /* ── Typewriter ── */
-  useEffect(() => {
-    if (phase !== "typing") return;
-    const full = aiMsg.text;
-    let i = 0;
-    setTyped("");
-
-    function next() {
-      i++;
-      setTyped(full.slice(0, i));
-      if (i < full.length) {
-        timerRef.current = setTimeout(next, CHAR_DELAY);
-      } else {
-        timerRef.current = setTimeout(() => {
-          setShowChips(true);
-          setPhase("done");
-        }, 180);
-      }
-    }
-    timerRef.current = setTimeout(next, CHAR_DELAY);
-    return clear;
-  }, [phase, aiMsg.text]);
-
-  /* ── Auto-loop: fade content → next conv → fade in ── */
-  useEffect(() => {
-    if (phase !== "done") return;
-    timerRef.current = setTimeout(() => {
-      // Fade out content
-      setContentVisible(false);
-      timerRef.current = setTimeout(() => {
-        // Advance to next conversation
-        setConvIdx(prev => (prev + 1) % CONVERSATIONS.length);
-        // Fade back in immediately after state reset
-        timerRef.current = setTimeout(() => setContentVisible(true), 50);
-      }, FADE_MS);
-    }, PAUSE_AFTER);
-    return clear;
-  }, [phase]);
+  function jumpTo(i: number) {
+    cancelRef.current = true;
+    setConvIdx(i);
+  }
 
   return (
     <section
@@ -174,54 +142,55 @@ export default function DemoWindow() {
             Una conversación cambia todo.
           </h2>
           <p
-            className="text-base max-w-[48ch] mx-auto"
+            className="text-[15px] max-w-[44ch] mx-auto leading-relaxed"
             style={{ color: "var(--muted-foreground)" }}
           >
             Habla normal. Zaelyn entiende lo que quieres decir y lo organiza solo.
           </p>
         </div>
 
-        {/* Ventana de demo — centrada */}
+        {/* Ventana centrada */}
         <div className="max-w-[680px] mx-auto">
           <div
             className="rounded-2xl overflow-hidden"
             style={{
               background: "var(--card)",
               border: "1px solid var(--border)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 4px 32px rgba(0,0,0,0.12)",
+              boxShadow: "0 8px 40px rgba(0,0,0,0.12)",
             }}
           >
             {/* Titlebar */}
             <div
-              className="flex items-center gap-2.5 px-5 py-3.5"
+              className="flex items-center gap-3 px-5 py-3.5"
               style={{ borderBottom: "1px solid var(--border)" }}
             >
               <div className="flex gap-1.5">
-                {["#ff5f57", "#febc2e", "#28c840"].map((c, i) => (
-                  <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c, opacity: 0.7 }} />
+                {["#ff5f57","#febc2e","#28c840"].map((c,i) => (
+                  <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c, opacity: 0.75 }} />
                 ))}
               </div>
-              <span className="text-[11px] ml-2" style={{ color: "var(--muted-foreground)", opacity: 0.6 }}>
+              <span className="text-[12px] ml-1" style={{ color: "var(--muted-foreground)", opacity: 0.6 }}>
                 zaelyn.ai · chat
               </span>
-              {/* Módulo badge */}
-              <span
-                className="ml-auto text-[10px] font-medium px-2 py-0.5 rounded-full"
-                style={{
-                  background: "rgba(99,102,241,0.1)",
-                  color: "#818cf8",
-                  border: "1px solid rgba(99,102,241,0.2)",
-                }}
-              >
-                {conv.turns[1].chips?.[0]?.module ?? "Zaelyn"}
-              </span>
+              {conv.chips && (
+                <span
+                  className="ml-auto text-[11px] font-medium px-2.5 py-0.5 rounded-full"
+                  style={{
+                    background: `${conv.chips[0].color}15`,
+                    color: conv.chips[0].color,
+                    border: `1px solid ${conv.chips[0].color}30`,
+                  }}
+                >
+                  {conv.chips.map(c => c.module).join(" + ")}
+                </span>
+              )}
             </div>
 
-            {/* Content — fade in/out */}
+            {/* Content */}
             <div
               className="px-6 py-6 flex flex-col gap-5"
               style={{
-                minHeight: "240px",
+                minHeight: "260px",
                 opacity: contentVisible ? 1 : 0,
                 transition: `opacity ${FADE_MS}ms ease`,
               }}
@@ -229,32 +198,28 @@ export default function DemoWindow() {
               {/* User message */}
               <div className="flex justify-end">
                 <div
-                  className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-tr-sm text-right"
+                  className="max-w-[85%] px-4 py-3 rounded-2xl rounded-tr-sm"
                   style={{
                     background: "rgba(99,102,241,0.1)",
                     border: "1px solid rgba(99,102,241,0.18)",
                   }}
                 >
                   <p
-                    className="text-[14px] leading-relaxed"
-                    style={{
-                      color: "var(--muted-foreground)",
-                      fontFamily: "var(--font-dm-sans)",
-                    }}
+                    className="text-[15px] leading-relaxed text-right"
+                    style={{ color: "var(--foreground)", opacity: 0.75, fontFamily: "var(--font-dm-sans)" }}
                   >
-                    {userMsg.text}
+                    {conv.user}
                   </p>
                 </div>
               </div>
 
               {/* Zaelyn response */}
-              {(phase === "typing" || phase === "done") && (
+              {showAI && (
                 <div className="flex gap-3 items-start">
-                  {/* Avatar */}
                   <div
-                    className="w-7 h-7 rounded-full flex-shrink-0 mt-0.5 flex items-center justify-center text-[10px] font-medium"
+                    className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[12px] font-medium"
                     style={{
-                      background: "rgba(139,92,246,0.15)",
+                      background: "rgba(139,92,246,0.12)",
                       border: "1px solid rgba(139,92,246,0.25)",
                       color: "#a78bfa",
                     }}
@@ -264,35 +229,30 @@ export default function DemoWindow() {
 
                   <div className="flex flex-col gap-3 flex-1">
                     <p
-                      className="text-[16px] leading-relaxed"
-                      style={{
-                        color: "var(--foreground)",
-                        fontFamily: "var(--font-dm-serif)",
-                      }}
+                      className="text-[17px] leading-relaxed"
+                      style={{ color: "var(--foreground)", fontFamily: "var(--font-dm-serif)" }}
                     >
                       {typed}
-                      {phase === "typing" && <span className="cursor-blink" />}
+                      {typed.length < conv.ai.length && (
+                        <span className="cursor-blink" />
+                      )}
                     </p>
 
-                    {/* Module chips */}
-                    {showChips && aiMsg.chips && aiMsg.chips.length > 0 && (
+                    {showChips && conv.chips && (
                       <div className="flex flex-wrap gap-2 fade-in-up">
-                        {aiMsg.chips.map((chip, i) => (
+                        {conv.chips.map((chip, i) => (
                           <span
                             key={i}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-medium"
                             style={{
-                              background: `${chip.color}18`,
-                              border: `1px solid ${chip.color}35`,
+                              background: `${chip.color}15`,
+                              border: `1px solid ${chip.color}30`,
                               color: chip.color,
                             }}
                           >
-                            <span
-                              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                              style={{ background: chip.color }}
-                            />
+                            <span className="w-1.5 h-1.5 rounded-full" style={{ background: chip.color }} />
                             {chip.module}
-                            <span style={{ color: `${chip.color}90` }}>— {chip.detail}</span>
+                            <span style={{ opacity: 0.65 }}>— {chip.detail}</span>
                           </span>
                         ))}
                       </div>
@@ -304,31 +264,28 @@ export default function DemoWindow() {
 
             {/* Progress dots */}
             <div
-              className="flex justify-center gap-2 pb-5"
+              className="flex justify-center gap-2 py-4"
               style={{ borderTop: "1px solid var(--border)" }}
             >
-              <div className="flex gap-2 pt-4">
-                {CONVERSATIONS.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { clear(); setContentVisible(false); setTimeout(() => { setConvIdx(i); setContentVisible(true); }, FADE_MS); }}
-                    className="rounded-full transition-all duration-300"
-                    style={{
-                      width: i === convIdx ? "20px" : "6px",
-                      height: "6px",
-                      background: i === convIdx ? "#6366f1" : "var(--border)",
-                    }}
-                    aria-label={`Ejemplo ${i + 1}`}
-                  />
-                ))}
-              </div>
+              {CONVERSATIONS.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => jumpTo(i)}
+                  className="rounded-full transition-all duration-300"
+                  style={{
+                    width: i === convIdx ? "20px" : "6px",
+                    height: "6px",
+                    background: i === convIdx ? "#6366f1" : "var(--border)",
+                  }}
+                  aria-label={`Ejemplo ${i + 1}`}
+                />
+              ))}
             </div>
           </div>
 
-          {/* Caption debajo */}
           <p
             className="text-center text-[12px] mt-4"
-            style={{ color: "var(--muted-foreground)", opacity: 0.6 }}
+            style={{ color: "var(--muted-foreground)", opacity: 0.5 }}
           >
             Diario · Recordatorios · Memoria · Metas — todo en una sola conversación
           </p>

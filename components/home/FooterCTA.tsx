@@ -15,27 +15,25 @@ export default function FooterCTA() {
   }
 
   return (
-    <section id="beta" className="py-28 px-6" style={{ background: "#080a0d" }}>
-      {/* Divider top */}
+    <section id="beta" className="py-28 px-6" style={{ background: "var(--background)" }}>
       <div className="max-w-[1400px] mx-auto">
-        <div className="w-full h-px mb-20" style={{ background: "rgba(255,255,255,0.04)" }} />
+        <div className="w-full h-px mb-20" style={{ background: "var(--border)" }} />
 
-        {/* Content — left aligned (DESIGN_VARIANCE=7) */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12 items-start">
           <div className="flex flex-col gap-5">
-            <p className="text-[11px] font-medium tracking-widest uppercase" style={{ color: "rgba(226,228,233,0.25)" }}>
-              Beta por invitacion
+            <p className="text-[12px] font-medium tracking-widest uppercase" style={{ color: "var(--muted-foreground)" }}>
+              Beta por invitación
             </p>
             <h2
               className="text-3xl md:text-4xl font-medium tracking-tight leading-tight"
-              style={{ color: "#e2e4e9", fontFamily: "var(--font-dm-sans)" }}
+              style={{ color: "var(--foreground)", fontFamily: "var(--font-dm-sans)" }}
             >
               Los primeros usuarios
               <br />
-              <span style={{ color: "rgba(226,228,233,0.4)" }}>definen el producto.</span>
+              <span style={{ color: "var(--muted-foreground)" }}>definen el producto.</span>
             </h2>
-            <p className="text-[14px] leading-relaxed max-w-[44ch]" style={{ color: "rgba(226,228,233,0.4)" }}>
-              La beta es cerrada. Zaelyn crece contigo — cada decision del producto es informada por usuarios reales, no metricas de vanidad.
+            <p className="text-[15px] leading-relaxed max-w-[44ch]" style={{ color: "var(--muted-foreground)" }}>
+              La beta es cerrada. Zaelyn crece contigo — cada decisión del producto es informada por usuarios reales, no métricas de vanidad.
             </p>
           </div>
 
@@ -43,17 +41,17 @@ export default function FooterCTA() {
             {sent ? (
               <div
                 className="p-5 rounded-xl"
-                style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)" }}
+                style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)" }}
               >
-                <p className="text-[14px] font-medium mb-1" style={{ color: "#10b981" }}>Listo</p>
-                <p className="text-[13px]" style={{ color: "rgba(226,228,233,0.45)" }}>
+                <p className="text-[15px] font-medium mb-1" style={{ color: "#10b981" }}>Listo</p>
+                <p className="text-[14px]" style={{ color: "var(--muted-foreground)" }}>
                   Te avisamos cuando haya cupo.
                 </p>
               </div>
             ) : (
               <>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                  <label className="text-[11px]" style={{ color: "rgba(226,228,233,0.35)" }}>
+                  <label className="text-[12px]" style={{ color: "var(--muted-foreground)" }}>
                     Correo para la lista de espera
                   </label>
                   <input
@@ -61,41 +59,39 @@ export default function FooterCTA() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="tu@email.com"
-                    className="h-10 px-4 rounded-md text-[13px] outline-none transition-all duration-200"
+                    className="h-11 px-4 rounded-md text-[14px] outline-none transition-all duration-200"
                     style={{
-                      background: "#0f1115",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      color: "#e2e4e9",
+                      background: "var(--card)",
+                      border: "1px solid var(--border)",
+                      color: "var(--foreground)",
                     }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(99,102,241,0.4)"; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(99,102,241,0.5)"; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
                   />
                   <button
                     type="submit"
-                    className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-md text-[13px] font-medium transition-all duration-200"
+                    className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-md text-[14px] font-medium transition-all duration-200"
                     style={{ background: "#6366f1", color: "#ffffff" }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#4f46e5"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "#6366f1"; }}
                   >
-                    Pedir invitacion beta
-                    <ArrowRight size={13} />
+                    Pedir invitación beta
+                    <ArrowRight size={14} />
                   </button>
                 </form>
 
-                <p className="text-[11px] text-center" style={{ color: "rgba(226,228,233,0.2)" }}>
-                  o
-                </p>
+                <p className="text-[12px] text-center" style={{ color: "var(--muted-foreground)", opacity: 0.4 }}>o</p>
 
                 <Link
                   href="/join"
-                  className="inline-flex items-center justify-center gap-1.5 h-10 px-5 rounded-md text-[13px] transition-all duration-200"
+                  className="inline-flex items-center justify-center gap-1.5 h-11 px-5 rounded-md text-[14px] transition-all duration-200"
                   style={{
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(255,255,255,0.06)",
-                    color: "rgba(226,228,233,0.5)",
+                    background: "var(--card)",
+                    border: "1px solid var(--border)",
+                    color: "var(--muted-foreground)",
                   }}
                 >
-                  Tengo un codigo de invitacion
+                  Tengo un código de invitación
                   <ArrowRight size={13} />
                 </Link>
               </>

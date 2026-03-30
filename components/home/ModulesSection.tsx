@@ -4,90 +4,122 @@ import { MODULES } from "@/lib/modules";
 
 export default function ModulesSection() {
   return (
-    <section id="modulos" className="py-24 px-6" style={{ background: "#080a0d" }}>
+    <section id="modulos" className="py-24 px-6" style={{ background: "var(--background)" }}>
       <div className="max-w-[1400px] mx-auto">
         {/* Header */}
-        <div className="mb-12 flex flex-col gap-3">
-          <p className="text-[11px] font-medium tracking-widest uppercase" style={{ color: "rgba(226,228,233,0.25)" }}>
+        <div className="mb-14 flex flex-col gap-3">
+          <p
+            className="text-[12px] font-medium tracking-widest uppercase"
+            style={{ color: "var(--muted-foreground)" }}
+          >
             Sistema estelar
           </p>
-          <h2 className="text-2xl md:text-3xl font-medium tracking-tight" style={{ color: "#e2e4e9", fontFamily: "var(--font-dm-sans)" }}>
-            Cada modulo, una dimension de ti.
+          <h2
+            className="text-3xl md:text-4xl font-medium tracking-tight"
+            style={{ color: "var(--foreground)", fontFamily: "var(--font-dm-sans)" }}
+          >
+            Una constelación de módulos inteligentes.
           </h2>
+          <p
+            className="text-[15px] leading-relaxed max-w-[56ch]"
+            style={{ color: "var(--muted-foreground)" }}
+          >
+            Cada módulo es un portal especializado. Todos conectados entre sí.
+            Todos alimentando a Zaelyn con el contexto de tu vida real.
+          </p>
         </div>
 
-        {/* Zig-zag layout — no 3-column cards (TASTE_SKILL Anti-Card Overuse) */}
-        <div className="flex flex-col gap-3">
-          {MODULES.map((mod, i) => (
+        {/* Grid de tarjetas — 3 columnas desktop, 2 tablet, 1 mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {MODULES.map((mod) => (
             <div
               key={mod.id}
-              className="group relative flex flex-col sm:flex-row items-start gap-5 p-5 rounded-xl transition-all duration-300"
+              className="relative flex flex-col gap-4 p-6 rounded-2xl transition-all duration-300"
               style={{
-                background: "transparent",
-                border: "1px solid rgba(255,255,255,0.04)",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.background = `${mod.color}06`;
-                (e.currentTarget as HTMLDivElement).style.borderColor = `${mod.color}20`;
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.background = "transparent";
-                (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.04)";
+                background: mod.disabled ? "var(--card)" : `${mod.color}08`,
+                border: `1px solid ${mod.color}${mod.disabled ? "18" : "28"}`,
+                opacity: mod.disabled ? 0.65 : 1,
               }}
             >
-              {/* Index + color dot */}
-              <div className="flex items-center gap-3 w-[180px] flex-shrink-0">
-                <div
-                  className="w-2 h-2 rounded-full flex-shrink-0 transition-all duration-300"
-                  style={{ background: mod.disabled ? "#4b5563" : mod.color }}
-                />
-                <div>
-                  <p className="text-[14px] font-medium" style={{ color: "#e2e4e9" }}>
-                    {mod.name}
-                  </p>
-                  <p className="text-[11px]" style={{ color: "rgba(226,228,233,0.3)" }}>
-                    {mod.fullName}
-                  </p>
-                </div>
-              </div>
-
-              {/* Description */}
-              <p
-                className="flex-1 text-[13px] leading-relaxed"
-                style={{ color: "rgba(226,228,233,0.5)" }}
-              >
-                {mod.description}
-              </p>
-
-              {/* Features — visible on hover via Tailwind */}
-              <div className="hidden sm:flex flex-wrap gap-1.5 w-[300px] flex-shrink-0">
-                {mod.features.map((f) => (
-                  <span
-                    key={f}
-                    className="text-[10px] px-2 py-0.5 rounded-full"
-                    style={{
-                      background: `${mod.color}10`,
-                      color: `${mod.color}cc`,
-                      border: `1px solid ${mod.color}1a`,
-                    }}
-                  >
-                    {f}
-                  </span>
-                ))}
-              </div>
-
-              {/* Phase badge for future modules */}
+              {/* Fase II badge */}
               {mod.disabled && (
                 <span
-                  className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full"
-                  style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.2)" }}
+                  className="absolute top-4 right-4 text-[10px] px-2 py-0.5 rounded-full font-medium"
+                  style={{
+                    background: "var(--muted)",
+                    color: "var(--muted-foreground)",
+                  }}
                 >
                   Fase II
                 </span>
               )}
+
+              {/* Categoría */}
+              <div className="flex items-center gap-2">
+                <span
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ background: mod.color }}
+                />
+                <span
+                  className="text-[10px] font-medium tracking-widest uppercase"
+                  style={{ color: mod.color, opacity: 0.9 }}
+                >
+                  {mod.category}
+                </span>
+              </div>
+
+              {/* Nombre */}
+              <div className="flex flex-col gap-1">
+                <h3
+                  className="text-[22px] font-medium leading-none"
+                  style={{ color: mod.color, fontFamily: "var(--font-dm-sans)" }}
+                >
+                  {mod.name}
+                </h3>
+                <p
+                  className="text-[11px]"
+                  style={{ color: "var(--muted-foreground)", fontFamily: "var(--font-dm-mono)", opacity: 0.7 }}
+                >
+                  {mod.fullName} · zaelyn.ai{mod.route}
+                </p>
+              </div>
+
+              {/* Descripción */}
+              <p
+                className="text-[14px] leading-relaxed"
+                style={{ color: "var(--foreground)", opacity: 0.75 }}
+              >
+                {mod.description}
+              </p>
+
+              {/* Features */}
+              <ul className="flex flex-col gap-1.5 mt-auto">
+                {mod.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <span
+                      className="mt-[5px] w-1 h-1 rounded-full flex-shrink-0"
+                      style={{ background: mod.color, opacity: 0.7 }}
+                    />
+                    <span
+                      className="text-[12px] leading-snug"
+                      style={{ color: "var(--muted-foreground)" }}
+                    >
+                      {f}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
+
+        {/* Footer note */}
+        <p
+          className="text-center text-[12px] mt-10"
+          style={{ color: "var(--muted-foreground)", opacity: 0.5 }}
+        >
+          Fase I incluye Mira, Sirius, Orion, Polaris, Pulsar y Pléyades · Fase II en desarrollo
+        </p>
       </div>
     </section>
   );
