@@ -9,8 +9,15 @@ export type WSServerMessage =
   | { type: "error"; code: string; message: string }
   | { type: "ping" };
 
+export interface WSMessageContext {
+  lang?: string;
+  isPhantom?: boolean;
+  phantomSubMode?: string;
+  isFirstToday?: boolean;
+}
+
 export type WSClientMessage =
-  | { type: "message"; content: string; conversationId?: string; anonToken?: string }
+  | { type: "message"; content: string; conversationId?: string; anonToken?: string; context?: WSMessageContext }
   | { type: "pong" };
 
 type MessageHandler = (msg: WSServerMessage) => void;
@@ -74,12 +81,18 @@ export class ZaelynWS {
     }
   }
 
-  sendMessage(content: string, conversationId?: string, anonToken?: string) {
+  sendMessage(
+    content: string,
+    conversationId?: string,
+    anonToken?: string,
+    context?: WSMessageContext
+  ) {
     this.send({
       type: "message",
       content,
       ...(conversationId ? { conversationId } : {}),
       ...(anonToken ? { anonToken } : {}),
+      ...(context ? { context } : {}),
     });
   }
 

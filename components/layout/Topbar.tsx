@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { Sun, Moon, CaretDown, Ghost, ShieldCheck } from "@phosphor-icons/react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { usePhantomStore } from "@/store/usePhantomStore";
+import { useLanguageStore } from "@/store/useLanguageStore";
 import { logout } from "@/lib/api";
+import type { Lang } from "@/lib/i18n";
 
 function getTheme() {
   if (typeof window === "undefined") return "dark";
@@ -17,6 +19,7 @@ export default function Topbar() {
   const router = useRouter();
   const { user, clearUser } = useAuthStore();
   const { isPhantom, deactivate } = usePhantomStore();
+  const { lang, setLang } = useLanguageStore();
   const [theme, setTheme] = useState<"dark" | "light">(() =>
     typeof window !== "undefined" ? (getTheme() as "dark" | "light") : "dark"
   );
@@ -105,6 +108,27 @@ export default function Topbar() {
           Sovereign
         </Link>
       )}
+
+      {/* Language pill */}
+      <div
+        className="hidden sm:flex items-center rounded-lg overflow-hidden flex-shrink-0"
+        style={{ border: "1px solid var(--border)", background: "rgba(255,255,255,0.03)" }}
+      >
+        {(["es", "en", "pt"] as Lang[]).map((l) => (
+          <button
+            key={l}
+            onClick={() => setLang(l)}
+            className="px-2.5 py-1 text-[10px] font-medium tracking-widest transition-all duration-150"
+            style={{
+              color: lang === l ? "#fff" : "var(--muted-foreground)",
+              background: lang === l ? "#6366f1" : "transparent",
+              letterSpacing: "0.06em",
+            }}
+          >
+            {l.toUpperCase()}
+          </button>
+        ))}
+      </div>
 
       {/* Theme toggle */}
       <button
