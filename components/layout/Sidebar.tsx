@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Plus, ChatsCircle, ChevronDown } from "@phosphor-icons/react";
+import { Plus, ChatsCircle, CaretDown } from "@phosphor-icons/react";
 import { useChatStore } from "@/store/useChatStore";
 import { useRightPanelStore } from "@/store/useRightPanelStore";
 
@@ -84,7 +84,7 @@ export default function Sidebar() {
                 style={{ color: "var(--muted-foreground)", opacity: 0.45 }}
               >
                 {group.label}
-                <ChevronDown
+                <CaretDown
                   size={10}
                   style={{
                     transform: collapsed[group.label] ? "rotate(-90deg)" : "rotate(0deg)",
