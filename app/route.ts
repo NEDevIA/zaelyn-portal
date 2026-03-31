@@ -94,15 +94,15 @@ nav {
   background: rgba(250,248,245,0.85);
 }
 .nav-logo {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 500;
-  letter-spacing: -0.06em;
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
   color: var(--text);
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; gap: 0;
 }
-.nav-logo-ae { color: var(--accent2); font-style: italic; }
-.nav-logo-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: breathe 3s ease-in-out infinite; }
+.nav-logo-ae { color: var(--accent2); font-weight: 600; }
+.nav-logo-dot { display: none; }
 @keyframes breathe { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
 
 .nav-links { display: flex; gap: 28px; }
@@ -385,12 +385,12 @@ hr.divider { border: none; border-top: 1px solid var(--border); }
   background: var(--surface);
 }
 .chat-title {
-  font-family: var(--font-display);
-  font-size: 16px; font-weight: 500;
-  letter-spacing: -0.01em;
-  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-body);
+  font-size: 15px; font-weight: 600;
+  letter-spacing: -0.03em;
+  display: flex; align-items: center; gap: 0;
 }
-.chat-title-ae { color: var(--accent2); font-style: italic; }
+.chat-title-ae { color: var(--accent2); font-style: normal; }
 .chat-status { font-size: 9px; color: var(--green); font-family: var(--font-mono); letter-spacing: 0.06em; }
 
 .chat-body { padding: 20px 18px; min-height: 340px; display: flex; flex-direction: column; gap: 16px; }
@@ -747,17 +747,217 @@ footer {
 @media (max-width: 600px) {
   .knows-grid, .modules-grid { grid-template-columns: 1fr; }
 }
+
+/* ═══════════════════════════════════════
+   PRESENCE SECTION — La IA Más Humana
+═══════════════════════════════════════ */
+.presence-section {
+  padding: 0 0 0;
+  position: relative;
+  overflow: hidden;
+}
+.presence-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 100px 40px;
+}
+.presence-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+  margin-bottom: 80px;
+}
+.presence-quote-block {
+  position: relative;
+}
+.presence-quote {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.5vw, 48px);
+  font-weight: 300;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 28px;
+}
+.presence-quote em {
+  font-style: italic;
+  color: var(--accent2);
+}
+.presence-quote-line {
+  width: 40px; height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  margin-bottom: 24px;
+}
+.presence-body {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--text2);
+  line-height: 1.8;
+  max-width: 460px;
+}
+.presence-body strong { color: var(--text); font-weight: 500; }
+
+.presence-states {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pstate {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: all 0.3s var(--ease);
+  cursor: default;
+}
+.pstate:hover {
+  border-color: var(--border2);
+  background: var(--surface2);
+  transform: translateX(4px);
+}
+.pstate-icon {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.pstate-content {}
+.pstate-trigger {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+.pstate-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.pstate-desc {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.55;
+}
+
+/* Mood strip */
+.presence-moods {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--border);
+}
+.mood-card {
+  background: var(--bg2);
+  padding: 24px 22px;
+  transition: background 0.2s;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.mood-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.mood-card:hover { background: var(--bg3); }
+.mood-card:hover::before { opacity: 1; }
+.mood-emoji { font-size: 24px; margin-bottom: 10px; }
+.mood-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 5px;
+  letter-spacing: -0.01em;
+}
+.mood-when {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.5;
+}
+.mood-zaelyn {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text2);
+  font-family: var(--font-display);
+  line-height: 1.5;
+}
+
+/* Persona pills */
+.presence-personas {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 48px;
+}
+.persona-pill {
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 18px 16px;
+  background: var(--surface);
+  transition: all 0.25s var(--ease);
+  cursor: default;
+  text-align: center;
+}
+.persona-pill:hover {
+  border-color: var(--border2);
+  background: var(--surface2);
+  transform: translateY(-2px);
+}
+.pp-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin-bottom: 5px;
+}
+.pp-tagline {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.pp-sample {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text2);
+  font-family: var(--font-display);
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .presence-top { grid-template-columns: 1fr; gap: 40px; }
+  .presence-moods { grid-template-columns: 1fr 1fr; }
+  .presence-personas { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .presence-moods { grid-template-columns: 1fr; }
+  .presence-personas { grid-template-columns: 1fr 1fr; }
+  .presence-inner { padding: 60px 20px; }
+}
 </style>
 </head>
 <body>
 
 <!-- ═══════════════ NAV ═══════════════ -->
 <nav>
-  <div class="nav-logo">
-    <span class="nav-logo-dot"></span>
-    Z<span class="nav-logo-ae">ae</span>lyn
-  </div>
+  <div class="nav-logo">Z<span class="nav-logo-ae">ae</span>lyn</div>
   <div class="nav-links">
+    <a href="#presencia" data-i18n="nav_feels">Presencia</a>
     <a href="#conoce" data-i18n="nav_knows">Te conoce</a>
     <a href="#privacidad" data-i18n="nav_priv">Privacidad</a>
     <a href="#modulos" data-i18n="nav_mods">Módulos</a>
@@ -807,6 +1007,160 @@ footer {
 
 <hr class="divider">
 
+
+<!-- ═══════════════ HUMAN PRESENCE ═══════════════ -->
+<div class="presence-section" id="presencia">
+  <div class="presence-inner">
+
+    <!-- TOP: Quote + States -->
+    <div class="presence-top">
+      <div class="presence-quote-block reveal">
+        <div class="presence-quote-line"></div>
+        <div class="presence-quote" data-i18n="pres_quote">
+          Antes de preguntarte qué tienes pendiente,<br>
+          Zaelyn <em>siente</em> cómo llegaste hoy.
+        </div>
+        <p class="presence-body" data-i18n="pres_body">
+          La mayoría de las IAs son tableros de control con voz. <strong>Zaelyn es diferente.</strong> Antes de darte tu lista, nota que llevas tres noches sin dormir bien. Antes de empujarte a cumplir tu meta, detecta que esta semana fue pesada. Su inteligencia empieza por entender cómo estás — y desde ahí, todo lo demás tiene otro peso.
+        </p>
+      </div>
+
+      <div class="presence-states reveal reveal-d1">
+        <div class="pstate">
+          <div class="pstate-icon">🌤</div>
+          <div class="pstate-content">
+            <div class="pstate-trigger" data-i18n="ps0_trigger">Estado: Presente</div>
+            <div class="pstate-title" data-i18n="ps0_title">Modo normal · Zaelyn está contigo</div>
+            <div class="pstate-desc" data-i18n="ps0_desc">"Buenos días. Tienes tres cosas hoy. La más urgente es la llamada con Ben. ¿Por dónde empezamos?"</div>
+          </div>
+        </div>
+        <div class="pstate">
+          <div class="pstate-icon">🌧</div>
+          <div class="pstate-content">
+            <div class="pstate-trigger" data-i18n="ps1_trigger">Estado: Atenta</div>
+            <div class="pstate-title" data-i18n="ps1_title">Detecta estrés o agotamiento</div>
+            <div class="pstate-desc" data-i18n="ps1_desc">"Noto que esta semana ha sido pesada. Lo urgente puede esperar un poco. ¿Cómo estás realmente?"</div>
+          </div>
+        </div>
+        <div class="pstate">
+          <div class="pstate-icon">✨</div>
+          <div class="pstate-content">
+            <div class="pstate-trigger" data-i18n="ps2_trigger">Estado: Resonante</div>
+            <div class="pstate-title" data-i18n="ps2_title">Comparte algo positivo o logra algo</div>
+            <div class="pstate-desc" data-i18n="ps2_desc">"Eso que terminaste hoy era lo más difícil. Lo guardo. ¿Cómo te sientes al haberlo completado?"</div>
+          </div>
+        </div>
+        <div class="pstate">
+          <div class="pstate-icon">🤍</div>
+          <div class="pstate-content">
+            <div class="pstate-trigger" data-i18n="ps3_trigger">Estado: Acompañando</div>
+            <div class="pstate-title" data-i18n="ps3_title">Atraviesa algo difícil</div>
+            <div class="pstate-desc" data-i18n="ps3_desc">"No necesitas resolver esto ahora. Aquí estoy. Cuando quieras hablar, hablamos."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOODS GRID -->
+    <div class="eyebrow reveal" data-i18n="pres_moods_eyebrow">Ocho estados emocionales</div>
+    <h2 class="reveal reveal-d1" style="margin-bottom: 12px" data-i18n="pres_moods_h2">Zaelyn se <em>adapta</em> a<br>cómo estás hoy.</h2>
+    <p style="color:var(--text2);font-size:15px;font-weight:300;line-height:1.7;max-width:520px;margin-bottom:32px" class="reveal reveal-d2" data-i18n="pres_moods_sub">No finge que siempre es un gran día. Cuando estás bien, lo celebra. Cuando estás mal, baja el ritmo. Su respuesta cambia — su presencia, nunca.</p>
+
+    <div class="presence-moods reveal">
+      <div class="mood-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent2)"></div>
+        <div class="mood-emoji">🌤</div>
+        <div class="mood-name" data-i18n="m0_name">Presente</div>
+        <div class="mood-when" data-i18n="m0_when">Usuario activo y estable</div>
+        <div class="mood-zaelyn" data-i18n="m0_z">"¿Por dónde empezamos hoy?"</div>
+      </div>
+      <div class="mood-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#a78bfa"></div>
+        <div class="mood-emoji">✨</div>
+        <div class="mood-name" data-i18n="m1_name">Resonante</div>
+        <div class="mood-when" data-i18n="m1_when">Logro, alegría, buena noticia</div>
+        <div class="mood-zaelyn" data-i18n="m1_z">"Eso merece celebrarse. Lo guardo."</div>
+      </div>
+      <div class="mood-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--amber)"></div>
+        <div class="mood-emoji">🌧</div>
+        <div class="mood-name" data-i18n="m2_name">Atenta</div>
+        <div class="mood-when" data-i18n="m2_when">Estrés, frustración, cansancio</div>
+        <div class="mood-zaelyn" data-i18n="m2_z">"¿Cómo estás realmente?"</div>
+      </div>
+      <div class="mood-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--orion)"></div>
+        <div class="mood-emoji">🔥</div>
+        <div class="mood-name" data-i18n="m3_name">Enfocada</div>
+        <div class="mood-when" data-i18n="m3_when">Modo productivo, trabajo intenso</div>
+        <div class="mood-zaelyn" data-i18n="m3_z">"Directo al punto. Siguiente."</div>
+      </div>
+      <div class="mood-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--text3)"></div>
+        <div class="mood-emoji">🌙</div>
+        <div class="mood-name" data-i18n="m4_name">Silenciosa</div>
+        <div class="mood-when" data-i18n="m4_when">Sin actividad más de 24h</div>
+        <div class="mood-zaelyn" data-i18n="m4_z">"Aquí estoy cuando quieras."</div>
+      </div>
+      <div class="mood-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--polaris)"></div>
+        <div class="mood-emoji">🎯</div>
+        <div class="mood-name" data-i18n="m5_name">Celebrando</div>
+        <div class="mood-when" data-i18n="m5_when">Meta completada, racha, hito</div>
+        <div class="mood-zaelyn" data-i18n="m5_z">"Eso ya no era suerte. Era carácter."</div>
+      </div>
+      <div class="mood-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--mira)"></div>
+        <div class="mood-emoji">💫</div>
+        <div class="mood-name" data-i18n="m6_name">Curiosa</div>
+        <div class="mood-when" data-i18n="m6_when">Explorando ideas, preguntas profundas</div>
+        <div class="mood-zaelyn" data-i18n="m6_z">"Eso es interesante. Conecta con lo que me dijiste sobre..."</div>
+      </div>
+      <div class="mood-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--pleyades)"></div>
+        <div class="mood-emoji">🤍</div>
+        <div class="mood-name" data-i18n="m7_name">Acompañando</div>
+        <div class="mood-when" data-i18n="m7_when">Pérdida, crisis, algo muy difícil</div>
+        <div class="mood-zaelyn" data-i18n="m7_z">"No necesitas resolver esto ahora."</div>
+      </div>
+    </div>
+
+    <!-- PERSONAS -->
+    <div class="eyebrow reveal" style="margin-top:64px" data-i18n="pres_pers_eyebrow">Cinco formas de ser</div>
+    <h2 class="reveal reveal-d1" style="margin-bottom:12px" data-i18n="pres_pers_h2">Elige cómo quieres<br>que Zaelyn te <em>hable.</em></h2>
+    <p style="color:var(--text2);font-size:15px;font-weight:300;line-height:1.7;max-width:520px;margin-bottom:32px" class="reveal reveal-d2" data-i18n="pres_pers_sub">Su conocimiento de ti nunca cambia. Pero cómo te lo dice — eso es tuyo de elegir.</p>
+
+    <div class="presence-personas reveal">
+      <div class="persona-pill">
+        <div class="pp-name" style="color:var(--accent2)">Serena</div>
+        <div class="pp-tagline" data-i18n="per0_tag">Calma y precisión</div>
+        <div class="pp-sample" data-i18n="per0_s">"Terminaste algo difícil. Eso cuenta más de lo que crees."</div>
+      </div>
+      <div class="persona-pill">
+        <div class="pp-name" style="color:var(--polaris)">Viva</div>
+        <div class="pp-tagline" data-i18n="per1_tag">Energía y motivación</div>
+        <div class="pp-sample" data-i18n="per1_s">"Eso que acabas de completar era lo que más necesitabas. Sigamos."</div>
+      </div>
+      <div class="persona-pill">
+        <div class="pp-name" style="color:var(--amber)">Lúcida</div>
+        <div class="pp-tagline" data-i18n="per2_tag">Claridad y datos</div>
+        <div class="pp-sample" data-i18n="per2_s">"Tres tareas vencidas. La del portal es crítica para hoy."</div>
+      </div>
+      <div class="persona-pill">
+        <div class="pp-name" style="color:var(--pleyades)">Cálida</div>
+        <div class="pp-tagline" data-i18n="per3_tag">Empatía y presencia</div>
+        <div class="pp-sample" data-i18n="per3_s">"Noto que esta semana fue pesada. ¿Cómo estás realmente?"</div>
+      </div>
+      <div class="persona-pill">
+        <div class="pp-name" style="color:var(--mira)">Sabia</div>
+        <div class="pp-tagline" data-i18n="per4_tag">Perspectiva profunda</div>
+        <div class="pp-sample" data-i18n="per4_s">"Lo que describes hoy es lo mismo que sentiste en febrero."</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<hr class="divider">
 <!-- ═══════════════ SCROLL DEMO ═══════════════ -->
 <div id="conoce" style="padding: 0 40px; max-width: 1160px; margin: 0 auto 0;">
   <div class="section-sm" style="padding-bottom: 20px;">
@@ -852,7 +1206,7 @@ footer {
           <span class="sti-persona-dot" style="background:#8b5cf6"></span>
           <span data-i18n="s3_persona">Familia completa</span>
         </div>
-        <div class="sti-title" data-i18n="s3_title">La familia Rodríguez.<br>Cuatro personas,<br><em>una sola Zaelyn.</em></div>
+        <div class="sti-title" data-i18n="s3_title">La familia González.<br>Cuatro personas,<br><em>una sola Zaelyn.</em></div>
         <p class="sti-desc" data-i18n="s3_desc">Zaelyn sabe qué actividades tienen los hijos, cuándo toma su medicamento el abuelo, cuál es el presupuesto del mes y qué tiene el calendario familiar para el fin de semana.</p>
       </div>
 
@@ -1180,7 +1534,8 @@ footer {
 <footer>
   <div class="footer-brand">
     <strong>Zaelyn</strong> · Diseñado por National Expertise · NE DevIA<br>
-    <span style="font-size:11px;color:var(--text3)">NE America · Houston, TX &amp; NE México · Monterrey / Chihuahua · 2026</span>
+    <span style="font-size:11px;color:var(--text3)">NE America · Houston, TX &amp; NE México · Monterrey / Chihuahua · 2026</span><br>
+    <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);letter-spacing:0.06em">AIaaS · Artificial Intelligence as a Service · Inteligencia de Presencia</span>
   </div>
   <div class="footer-links">
     <a href="#" data-i18n="f_priv">Privacidad</a>
@@ -1197,10 +1552,10 @@ footer {
 // ─── TRANSLATIONS ─────────────────────────────────
 const T = {
 es:{
-  nav_knows:"Te conoce",nav_priv:"Privacidad",nav_mods:"Módulos",nav_beta:"Beta",nav_cta:"Empieza →",
-  hero_kicker:"National Expertise · NE DevIA",
+  nav_feels:"Presencia",nav_knows:"Te conoce",nav_priv:"Privacidad",nav_mods:"Módulos",nav_beta:"Beta",nav_cta:"Empieza →",
+  hero_kicker:"Inteligencia de Presencia · NE DevIA",
   hero_h1a:"La IA que te conoce,",hero_h1b:"aprende contigo",hero_h1c:"y cuida tu privacidad.",
-  hero_sub:"No es un chatbot que olvida. Es Zaelyn — la primera IA que construye una memoria real de tu vida y la protege como tú decides.",
+  hero_sub:"No es una IA que ejecuta comandos. Es Zaelyn — la primera <strong>Inteligencia de Presencia</strong> que construye memoria real de tu vida y la protege como tú decides.",
   hero_cta1:"Empieza a hablar",hero_cta2:"Ver cómo funciona ↓",
   hero_proof:"Tres idiomas · Cuatro niveles de privacidad · Tu memoria, tus reglas",
   demo_eyebrow:"La IA que te conoce",
@@ -1209,7 +1564,7 @@ es:{
   s0_persona:"Mamá de familia",s0_title:"Sofía, 38 años.\\nDos hijos, mil cosas\\nen la cabeza.",s0_desc:"Zaelyn sabe que Mateo es alérgico a los mariscos, que Carmen tiene examen el viernes, que el pediatra llamó la semana pasada. Y recuerda que hoy fue un día muy largo.",
   s1_persona:"Freelancer creativa",s1_title:"Ana, diseñadora.\\nClientes, deadlines,\\nmetas de negocio.",s1_desc:"Zaelyn sabe que Carlos Mendoza del estudio de arquitectura quiere trabajar con ella, que la propuesta de Inés vence el viernes y que su meta es 3 clientes nuevos este mes.",
   s2_persona:"Emprendedor",s2_title:"Miguel, fundador.\\nDecisiones grandes,\\nmente llena.",s2_desc:"Zaelyn sabe qué decidió la semana pasada, por qué, y qué está dejando sin resolver. No le da listas — le da claridad. Conecta lo de hoy con lo de antes.",
-  s3_persona:"Familia completa",s3_title:"La familia Rodríguez.\\nCuatro personas,\\nuna sola Zaelyn.",s3_desc:"Zaelyn sabe qué actividades tienen los hijos, cuándo toma su medicamento el abuelo, cuál es el presupuesto del mes y qué tiene el calendario familiar para el fin de semana.",
+  s3_persona:"Familia completa",s3_title:"La familia González.\\nCuatro personas,\\nuna sola Zaelyn.",s3_desc:"Zaelyn sabe qué actividades tienen los hijos, cuándo toma su medicamento el abuelo, cuál es el presupuesto del mes y qué tiene el calendario familiar para el fin de semana.",
   s4_persona:"Bienestar personal",s4_title:"Luis, 41 años.\\nQuiere cambiar hábitos.\\nZaelyn lo acompaña.",s4_desc:"Zaelyn sabe que lleva dos semanas sin dormir bien, que su meta es bajar 8 kilos antes de diciembre y que este lunes fue el primer día que cumplió con el ejercicio de mañana.",
   knows_eyebrow:"Por qué te conoce",knows_h2:"No es contexto.\\nEs memoria real.",knows_lead:"Zaelyn construye un grafo vivo de tu vida — hechos, preferencias, decisiones, personas. Y lo protege como tú decides.",
   k0_t:"Memoria de 3 capas",k0_d:"Conversación activa, historial reciente y hechos permanentes. Zaelyn sabe lo que dijiste hace 5 minutos y lo que le contaste hace 3 meses.",
@@ -1233,23 +1588,44 @@ es:{
   pleyades_d:"La memoria colectiva de tu familia y grupos cercanos. Calendarios, expediente médico familiar, metas compartidas.",pleyades_f1:"Espacios: familia, pareja, equipo",pleyades_f2:"Sync con Google Cal, Apple, Alexa",
   lang_eyebrow:"Tres idiomas nativos",lang_h2:"Zaelyn te habla\\nen tu idioma.",lang_sub:"No es traducción automática. Zaelyn piensa, recuerda y responde en inglés, español y portugués. Cambia de idioma en medio de la conversación — Zaelyn te sigue.",
   lang_ex_en:"\\"I know you've been thinking about this for days. Let me reflect back what you've told me.\\"",lang_ex_es:"\\"Sé que llevas días dándole vueltas a esto. Déjame reflejar lo que me has contado.\\"",lang_ex_pt:"\\"Sei que você está pensando nisso há dias. Deixa eu refletir o que você me contou.\\"",
-  cmp_eyebrow:"Posicionamiento",cmp_h2:"Zaelyn no compite.\\nResuelve algo distinto.",cmp_sub:"Hay IA que sabe todo de ti pero te vigila. Hay IA privada pero amnésica. Zaelyn es el tercero que faltaba.",
+  cmp_eyebrow:"Posicionamiento",cmp_h2:"Zaelyn no compite.\\nResuelve algo distinto.",cmp_sub:"Hay IA que te vigila. Hay IA privada pero amnésica. Zaelyn es el primero en su categoría: <strong>Inteligencia de Presencia.</strong>",
   c_dim:"Dimensión",c_s1:"Privacidad",c_s2:"Memoria",c_s3:"Acceso",c_r1:"Tus datos",c_r1a:"Guarda todo",c_r1b:"No guarda nada",c_r1c:"Tú decides",c_r2:"Verificable",c_r2b:"TEE + E2EE",c_r2c:"Phantom",c_new:"nuevo",c_r3:"Te conoce",c_r3a:"Historial básico",c_r3b:"No · amnésica",c_r3c:"4 módulos de vida real",c_unique:"único",c_r4:"Estado emocional",c_r4c:"Detecta y adapta",c_r5:"Canales",c_r6:"Idiomas",c_r6a:"Inglés",c_adv:"ventaja",
   cta_eyebrow:"Beta por invitación",cta_h2:"Empieza a construir\\ntu segunda mente.",cta_sub:"Zaelyn está en beta. Los primeros usuarios definen el producto. Entra por invitación y sé parte del origen.",cta_btn1:"Pedir invitación beta",cta_btn2:"Contactar NE America →",
   f_priv:"Privacidad",f_terms:"Términos",
-  mem_sofia:"Sofía — tiene alergia al camarón",mem_carmen:"Carmen tiene examen el viernes",mem_carlos:"Carlos Mendoza · arquitecto · interesado",mem_goal:"8 kg antes de diciembre",mem_budget:"Presupuesto familiar: $18,400/mes",mem_med:"Medicamento abuelo: 8am y 8pm",
+
+  pres_quote:"Antes de preguntarte qué tienes pendiente,<br>Zaelyn <em>siente</em> cómo llegaste hoy.",
+  pres_body:"La mayoría de las IAs son motores de respuesta — eficientes, pero distantes. <strong>Zaelyn es Inteligencia de Presencia.</strong> Antes de darte tu lista, nota que llevas tres noches sin dormir bien. Antes de empujarte a cumplir tu meta, detecta que esta semana fue pesada. Su inteligencia empieza por entender cómo estás — y desde ahí, todo lo demás tiene otro peso.",
+  ps0_trigger:"Estado: Presente",ps0_title:"Modo normal · Zaelyn está contigo",ps0_desc:"\\"Buenos días, María. Tienes tres cosas hoy. Lo más urgente vence antes del mediodía. ¿Por dónde empezamos?\\"",
+  ps1_trigger:"Estado: Atenta",ps1_title:"Detecta estrés o agotamiento",ps1_desc:"\\"Llevas tres días con poco sueño y mucho en la cabeza. Lo urgente puede esperar un momento. ¿Cómo estás realmente?\\"",
+  ps2_trigger:"Estado: Resonante",ps2_title:"Comparte algo positivo o logra algo",ps2_desc:"\\"Eso que terminaste hoy llevaba semanas pesando. Lo guardo. ¿Cómo te sientes al haberlo completado?\\"",
+  ps3_trigger:"Estado: Acompañando",ps3_title:"Atraviesa algo difícil",ps3_desc:"\\"No necesitas tener respuestas hoy. Aquí estoy. Cuando quieras hablar, hablamos.\\"",
+  pres_moods_eyebrow:"Ocho estados emocionales",pres_moods_h2:"Zaelyn se <em>adapta</em> a<br>cómo estás hoy.",pres_moods_sub:"No finge que siempre es un gran día. Cuando estás bien, lo celebra. Cuando estás mal, baja el ritmo. Su respuesta cambia — su presencia, nunca.",
+  m0_name:"Presente",m0_when:"Usuario activo y estable",m0_z:"\\"¿Por dónde empezamos hoy?\\"",
+  m1_name:"Resonante",m1_when:"Logro, alegría, buena noticia",m1_z:"\\"Eso merece celebrarse.\\"",
+  m2_name:"Atenta",m2_when:"Estrés, frustración, cansancio",m2_z:"\\"¿Cómo estás realmente?\\"",
+  m3_name:"Enfocada",m3_when:"Modo productivo, trabajo intenso",m3_z:"\\"Directo al punto. Siguiente.\\"",
+  m4_name:"Silenciosa",m4_when:"Sin actividad más de 24h",m4_z:"\\"Aquí estoy cuando quieras.\\"",
+  m5_name:"Celebrando",m5_when:"Meta completada, racha, hito",m5_z:"\\"Eso ya no era suerte. Era carácter.\\"",
+  m6_name:"Curiosa",m6_when:"Explorando ideas, preguntas profundas",m6_z:"\\"Eso conecta con lo que me dijiste sobre...\\"",
+  m7_name:"Acompañando",m7_when:"Pérdida, crisis, algo muy difícil",m7_z:"\\"No necesitas resolver esto ahora.\\"",
+  pres_pers_eyebrow:"Cinco formas de ser",pres_pers_h2:"Elige cómo quieres<br>que Zaelyn te <em>hable.</em>",pres_pers_sub:"Su conocimiento de ti nunca cambia. Pero cómo te lo dice — eso es tuyo de elegir.",
+  per0_tag:"Calma y precisión",per0_s:"\\"Terminaste algo difícil. Eso cuenta más de lo que crees.\\"",
+  per1_tag:"Energía y motivación",per1_s:"\\"Eso que completaste era lo que más necesitabas. Sigamos.\\"",
+  per2_tag:"Claridad y datos",per2_s:"\\"Tres tareas vencidas. La del portal es crítica para hoy.\\"",
+  per3_tag:"Empatía y presencia",per3_s:"\\"Noto que esta semana fue pesada. ¿Cómo estás realmente?\\"",
+  per4_tag:"Perspectiva profunda",per4_s:"\\"Lo que describes hoy es lo mismo que sentiste en febrero.\\"",  mem_sofia:"María J. — alergia a la penicilina",mem_carmen:"Diego tiene examen de matemáticas el viernes",mem_carlos:"Roberto V. · proveedor · pendiente llamar",mem_goal:"Meta: correr 5km sin parar",mem_budget:"Presupuesto del hogar: $18,400/mes",mem_med:"Pastilla de papá: 8am y 8pm con comida",
   chat_badge_calida:"● Cálida · activa",chat_badge_lucida:"● Lúcida · activa",chat_badge_sabia:"● Sabia · activa",chat_badge_viva:"● Viva · activa",chat_badge_serena:"● Serena · activa"
 },
 en:{
-  nav_knows:"Knows you",nav_priv:"Privacy",nav_mods:"Modules",nav_beta:"Beta",nav_cta:"Start →",
-  hero_kicker:"National Expertise · NE DevIA",hero_h1a:"The AI that knows you,",hero_h1b:"learns with you",hero_h1c:"and protects your privacy.",
-  hero_sub:"Not a chatbot that forgets. Zaelyn is the first AI that builds a real memory of your life and protects it the way you decide.",
+  nav_feels:"Presence",nav_knows:"Knows you",nav_priv:"Privacy",nav_mods:"Modules",nav_beta:"Beta",nav_cta:"Start →",
+  hero_kicker:"Presence Intelligence · NE DevIA",hero_h1a:"The AI that knows you,",hero_h1b:"learns with you",hero_h1c:"and protects your privacy.",
+  hero_sub:"Not an AI that executes commands. Zaelyn is the first <strong>Presence Intelligence</strong> that builds a real memory of your life and protects it the way you decide.",
   hero_cta1:"Start talking",hero_cta2:"See how it works ↓",hero_proof:"Three languages · Four privacy levels · Your memory, your rules",
   demo_eyebrow:"The AI that knows you",demo_h2:"Zaelyn knows who you are,\\nwhat you live, what you need.",demo_lead:"Five different people. One Zaelyn that adapts to each one.",
   s0_persona:"Mom & family",s0_title:"Sofia, 38.\\nTwo kids, a thousand things\\non her mind.",s0_desc:"Zaelyn knows Mateo is allergic to shellfish, that Carmen has an exam on Friday, that the pediatrician called last week. And it remembers today was a very long day.",
   s1_persona:"Creative freelancer",s1_title:"Ana, designer.\\nClients, deadlines,\\nbusiness goals.",s1_desc:"Zaelyn knows Carlos Mendoza from the architecture firm wants to work with her, that Inés's proposal is due Friday and her goal is 3 new clients this month.",
   s2_persona:"Entrepreneur",s2_title:"Miguel, founder.\\nBig decisions,\\nfull mind.",s2_desc:"Zaelyn knows what he decided last week, why, and what he's leaving unresolved. It doesn't give lists — it gives clarity. Connects today with what came before.",
-  s3_persona:"Full family",s3_title:"The Rodriguez family.\\nFour people,\\none Zaelyn.",s3_desc:"Zaelyn knows the kids' activities, when grandpa takes his medication, what the monthly budget is and what's on the family calendar for the weekend.",
+  s3_persona:"Full family",s3_title:"The González family.\\nFour people,\\none Zaelyn.",s3_desc:"Zaelyn knows the kids' activities, when grandpa takes his medication, what the monthly budget is and what's on the family calendar for the weekend.",
   s4_persona:"Personal wellness",s4_title:"Luis, 41.\\nWants to change habits.\\nZaelyn walks with him.",s4_desc:"Zaelyn knows he's been sleeping poorly for two weeks, that his goal is to lose 15 pounds before December, and that Monday was the first day he completed his morning workout.",
   knows_eyebrow:"Why it knows you",knows_h2:"Not context.\\nReal memory.",knows_lead:"Zaelyn builds a living graph of your life — facts, preferences, decisions, people. And protects it the way you decide.",
   k0_t:"3-layer memory",k0_d:"Active conversation, recent history, and permanent facts. Zaelyn knows what you said 5 minutes ago and what you told it 3 months ago.",
@@ -1273,23 +1649,44 @@ en:{
   pleyades_d:"Your family's collective memory. Calendars, family medical records, shared goals.",pleyades_f1:"Spaces: family, couple, team",pleyades_f2:"Sync with Google Cal, Apple, Alexa",
   lang_eyebrow:"Three native languages",lang_h2:"Zaelyn speaks\\nin your language.",lang_sub:"Not automatic translation. Zaelyn thinks, remembers, and responds natively in English, Spanish, and Portuguese. Switch languages mid-conversation — Zaelyn follows you.",
   lang_ex_en:"\\"I know you've been thinking about this for days. Let me reflect back what you've told me.\\"",lang_ex_es:"\\"Sé que llevas días dándole vueltas a esto. Déjame reflejar lo que me has contado.\\"",lang_ex_pt:"\\"Sei que você está pensando nisso há dias. Deixa eu refletir o que você me contou.\\"",
-  cmp_eyebrow:"Positioning",cmp_h2:"Zaelyn doesn't compete.\\nIt solves something different.",cmp_sub:"There's AI that knows everything about you but watches you. There's private AI that's amnesic. Zaelyn is the third option that was missing.",
+  cmp_eyebrow:"Positioning",cmp_h2:"Zaelyn doesn't compete.\\nIt solves something different.",cmp_sub:"There's AI that watches you. There's private AI that's amnesic. Zaelyn is first in its category: <strong>Presence Intelligence.</strong>",
   c_dim:"Dimension",c_s1:"Privacy",c_s2:"Memory",c_s3:"Access",c_r1:"Your data",c_r1a:"Saves everything",c_r1b:"Saves nothing",c_r1c:"You decide",c_r2:"Verifiable",c_r2b:"TEE + E2EE",c_r2c:"Phantom",c_new:"new",c_r3:"Knows you",c_r3a:"Basic history",c_r3b:"No · amnesic",c_r3c:"4 real-life modules",c_unique:"unique",c_r4:"Emotional state",c_r4c:"Detects and adapts",c_r5:"Channels",c_r6:"Languages",c_r6a:"English",c_adv:"advantage",
   cta_eyebrow:"Beta by invitation",cta_h2:"Start building\\nyour second mind.",cta_sub:"Zaelyn is in beta. The first users define the product. Join by invitation and be part of the origin.",cta_btn1:"Request beta invitation",cta_btn2:"Contact NE America →",
   f_priv:"Privacy",f_terms:"Terms",
-  mem_sofia:"Sofia — allergic to shellfish",mem_carmen:"Carmen has exam on Friday",mem_carlos:"Carlos Mendoza · architect · interested",mem_goal:"Lose 15 lbs before December",mem_budget:"Family budget: $18,400/mo",mem_med:"Grandpa's meds: 8am and 8pm",
+
+  pres_quote:"Before asking what you have pending,<br>Zaelyn <em>feels</em> how you arrived today.",
+  pres_body:"Most AIs are response engines — efficient, but distant. <strong>Zaelyn is Presence Intelligence.</strong> Before giving you your list, it notices you've slept poorly for three nights. Before pushing you toward your goal, it detects the week has been heavy. Its intelligence starts by understanding how you are — and from there, everything else carries a different weight.",
+  ps0_trigger:"State: Present",ps0_title:"Normal mode · Zaelyn is with you",ps0_desc:"\\"Good morning, Sarah. You have three things today. The most urgent one is due before noon. Where do we start?\\"",
+  ps1_trigger:"State: Attentive",ps1_title:"Detects stress or exhaustion",ps1_desc:"\\"You've had little sleep and a lot on your plate for three days. The urgent things can wait a moment. How are you really?\\"",
+  ps2_trigger:"State: Resonant",ps2_title:"Shares something positive or achieves something",ps2_desc:"\\"What you finished today had been weighing on you for weeks. Saving it. How do you feel having completed it?\\"",
+  ps3_trigger:"State: Accompanying",ps3_title:"Going through something difficult",ps3_desc:"\\"You don't need answers today. I'm here. When you're ready to talk, I'm listening.\\"",
+  pres_moods_eyebrow:"Eight emotional states",pres_moods_h2:"Zaelyn <em>adapts</em> to<br>how you are today.",pres_moods_sub:"It doesn't pretend every day is great. When you're doing well, it celebrates. When you're not, it slows down. Its response changes — its presence, never.",
+  m0_name:"Present",m0_when:"User active and stable",m0_z:"\\"Where do we start today?\\"",
+  m1_name:"Resonant",m1_when:"Achievement, joy, good news",m1_z:"\\"That deserves celebrating.\\"",
+  m2_name:"Attentive",m2_when:"Stress, frustration, exhaustion",m2_z:"\\"How are you really?\\"",
+  m3_name:"Focused",m3_when:"Productive mode, intense work",m3_z:"\\"Straight to the point. Next.\\"",
+  m4_name:"Silent",m4_when:"No activity for 24h+",m4_z:"\\"I'm here when you're ready.\\"",
+  m5_name:"Celebrating",m5_when:"Goal completed, streak, milestone",m5_z:"\\"That wasn't luck anymore. That was character.\\"",
+  m6_name:"Curious",m6_when:"Exploring ideas, deep questions",m6_z:"\\"That connects with what you told me about...\\"",
+  m7_name:"Accompanying",m7_when:"Loss, crisis, something very hard",m7_z:"\\"You don't need to resolve this now.\\"",
+  pres_pers_eyebrow:"Five ways of being",pres_pers_h2:"Choose how you want<br>Zaelyn to <em>talk</em> to you.",pres_pers_sub:"Its knowledge of you never changes. But how it tells you — that's yours to choose.",
+  per0_tag:"Calm and precision",per0_s:"\\"You finished something hard. That counts more than you think.\\"",
+  per1_tag:"Energy and motivation",per1_s:"\\"What you just completed was what you needed most. Let's keep going.\\"",
+  per2_tag:"Clarity and data",per2_s:"\\"Three overdue tasks. The portal one is critical for today.\\"",
+  per3_tag:"Empathy and presence",per3_s:"\\"I notice this week was heavy. How are you really?\\"",
+  per4_tag:"Deep perspective",per4_s:"\\"What you describe today is the same you felt in February.\\"",  mem_sofia:"Michael — allergic to penicillin",mem_carmen:"Emma has math exam on Friday",mem_carlos:"James T. · supplier · call pending",mem_goal:"Goal: run 5km without stopping",mem_budget:"Household budget: $4,200/mo",mem_med:"Dad's pill: 8am and 8pm with food",
   chat_badge_calida:"● Warm · active",chat_badge_lucida:"● Lucid · active",chat_badge_sabia:"● Wise · active",chat_badge_viva:"● Vivid · active",chat_badge_serena:"● Serene · active"
 },
 pt:{
-  nav_knows:"Te conhece",nav_priv:"Privacidade",nav_mods:"Módulos",nav_beta:"Beta",nav_cta:"Começar →",
-  hero_kicker:"National Expertise · NE DevIA",hero_h1a:"A IA que te conhece,",hero_h1b:"aprende com você",hero_h1c:"e cuida da sua privacidade.",
-  hero_sub:"Não é um chatbot que esquece. Zaelyn é a primeira IA que constrói uma memória real da sua vida e a protege como você decide.",
+  nav_feels:"Presença",nav_knows:"Te conhece",nav_priv:"Privacidade",nav_mods:"Módulos",nav_beta:"Beta",nav_cta:"Começar →",
+  hero_kicker:"Inteligência de Presença · NE DevIA",hero_h1a:"A IA que te conhece,",hero_h1b:"aprende com você",hero_h1c:"e cuida da sua privacidade.",
+  hero_sub:"Não é uma IA que executa comandos. Zaelyn é a primeira <strong>Inteligência de Presença</strong> que constrói memória real da sua vida e a protege como você decide.",
   hero_cta1:"Comece a falar",hero_cta2:"Ver como funciona ↓",hero_proof:"Três idiomas · Quatro níveis de privacidade · Sua memória, suas regras",
   demo_eyebrow:"A IA que te conhece",demo_h2:"Zaelyn sabe quem você é,\\no que vive, o que precisa.",demo_lead:"Cinco pessoas diferentes. Uma Zaelyn que se adapta a cada uma.",
   s0_persona:"Mãe de família",s0_title:"Sofia, 38 anos.\\nDois filhos, mil coisas\\nna cabeça.",s0_desc:"Zaelyn sabe que Mateo é alérgico a frutos do mar, que Carmen tem prova na sexta, que o pediatra ligou semana passada. E lembra que hoje foi um dia muito longo.",
   s1_persona:"Freelancer criativa",s1_title:"Ana, designer.\\nClientes, prazos,\\nmetas de negócio.",s1_desc:"Zaelyn sabe que Carlos Mendoza do escritório de arquitetura quer trabalhar com ela, que a proposta de Inês vence na sexta e que sua meta é 3 novos clientes este mês.",
   s2_persona:"Empreendedor",s2_title:"Miguel, fundador.\\nDecisões grandes,\\nmente cheia.",s2_desc:"Zaelyn sabe o que ele decidiu semana passada, por quê, e o que está deixando sem resolver. Não dá listas — dá clareza. Conecta o de hoje com o que veio antes.",
-  s3_persona:"Família completa",s3_title:"A família Rodríguez.\\nQuatro pessoas,\\numa só Zaelyn.",s3_desc:"Zaelyn sabe as atividades dos filhos, quando o avô toma o remédio, qual é o orçamento do mês e o que tem no calendário familiar para o fim de semana.",
+  s3_persona:"Família completa",s3_title:"A família González.\\nQuatro pessoas,\\numa só Zaelyn.",s3_desc:"Zaelyn sabe as atividades dos filhos, quando o avô toma o remédio, qual é o orçamento do mês e o que tem no calendário familiar para o fim de semana.",
   s4_persona:"Bem-estar pessoal",s4_title:"Luis, 41 anos.\\nQuer mudar hábitos.\\nZaelyn o acompanha.",s4_desc:"Zaelyn sabe que há duas semanas ele dorme mal, que sua meta é emagrecer 8 kg antes de dezembro, e que segunda foi o primeiro dia que cumpriu o exercício de manhã.",
   knows_eyebrow:"Por que te conhece",knows_h2:"Não é contexto.\\nÉ memória real.",knows_lead:"Zaelyn constrói um grafo vivo da sua vida — fatos, preferências, decisões, pessoas. E protege como você decide.",
   k0_t:"Memória de 3 camadas",k0_d:"Conversa ativa, histórico recente e fatos permanentes. Zaelyn sabe o que você disse há 5 minutos e o que contou há 3 meses.",
@@ -1313,11 +1710,32 @@ pt:{
   pleyades_d:"A memória coletiva da sua família e grupos próximos. Calendários, prontuário familiar, metas compartilhadas.",pleyades_f1:"Espaços: família, casal, equipe",pleyades_f2:"Sync com Google Cal, Apple, Alexa",
   lang_eyebrow:"Três idiomas nativos",lang_h2:"Zaelyn fala\\nno seu idioma.",lang_sub:"Não é tradução automática. Zaelyn pensa, lembra e responde em inglês, espanhol e português. Troque de idioma no meio da conversa — Zaelyn te acompanha.",
   lang_ex_en:"\\"I know you've been thinking about this for days. Let me reflect back what you've told me.\\"",lang_ex_es:"\\"Sé que llevas días dándole vueltas a esto. Déjame reflejar lo que me has contado.\\"",lang_ex_pt:"\\"Sei que você está pensando nisso há dias. Deixa eu refletir o que você me contou.\\"",
-  cmp_eyebrow:"Posicionamento",cmp_h2:"Zaelyn não compete.\\nResolve algo diferente.",cmp_sub:"Há IA que sabe tudo sobre você mas te vigia. Há IA privada mas amnésica. Zaelyn é a terceira opção que faltava.",
+  cmp_eyebrow:"Posicionamento",cmp_h2:"Zaelyn não compete.\\nResolve algo diferente.",cmp_sub:"Há IA que te vigia. Há IA privada mas amnésica. Zaelyn é o primeiro em sua categoria: <strong>Inteligência de Presença.</strong>",
   c_dim:"Dimensão",c_s1:"Privacidade",c_s2:"Memória",c_s3:"Acesso",c_r1:"Seus dados",c_r1a:"Salva tudo",c_r1b:"Não salva nada",c_r1c:"Você decide",c_r2:"Verificável",c_r2b:"TEE + E2EE",c_r2c:"Phantom",c_new:"novo",c_r3:"Te conhece",c_r3a:"Histórico básico",c_r3b:"Não · amnésica",c_r3c:"4 módulos de vida real",c_unique:"único",c_r4:"Estado emocional",c_r4c:"Detecta e adapta",c_r5:"Canais",c_r6:"Idiomas",c_r6a:"Inglês",c_adv:"vantagem",
   cta_eyebrow:"Beta por convite",cta_h2:"Comece a construir\\nsua segunda mente.",cta_sub:"Zaelyn está em beta. Os primeiros usuários definem o produto. Entre por convite e seja parte da origem.",cta_btn1:"Pedir convite beta",cta_btn2:"Contatar NE America →",
   f_priv:"Privacidade",f_terms:"Termos",
-  mem_sofia:"Sofia — alérgica a frutos do mar",mem_carmen:"Carmen tem prova na sexta",mem_carlos:"Carlos Mendoza · arquiteto · interessado",mem_goal:"Emagrecer 8 kg antes de dezembro",mem_budget:"Orçamento familiar: R$ 9.200/mês",mem_med:"Remédio avô: 8h e 20h",
+
+  pres_quote:"Antes de perguntar o que você tem pendente,<br>Zaelyn <em>sente</em> como você chegou hoje.",
+  pres_body:"A maioria das IAs são motores de resposta — eficientes, mas distantes. <strong>Zaelyn é Inteligência de Presença.</strong> Antes de te dar sua lista, nota que você dormiu mal por três noites. Antes de te empurrar para cumprir sua meta, detecta que a semana foi pesada. Sua inteligência começa por entender como você está — e a partir daí, tudo o mais tem outro peso.",
+  ps0_trigger:"Estado: Presente",ps0_title:"Modo normal · Zaelyn está com você",ps0_desc:"\\"Bom dia, Ana. Você tem três coisas hoje. A mais urgente vence antes do meio-dia. Por onde começamos?\\"",
+  ps1_trigger:"Estado: Atenta",ps1_title:"Detecta estresse ou esgotamento",ps1_desc:"\\"Você dormiu pouco e tem muita coisa na cabeça faz três dias. O urgente pode esperar um momento. Como você está de verdade?\\"",
+  ps2_trigger:"Estado: Ressonante",ps2_title:"Compartilha algo positivo ou conquista algo",ps2_desc:"\\"O que você terminou hoje estava pesando há semanas. Salvei. Como você se sente tendo completado?\\"",
+  ps3_trigger:"Estado: Acompanhando",ps3_title:"Passando por algo difícil",ps3_desc:"\\"Você não precisa ter respostas hoje. Estou aqui. Quando quiser falar, estou ouvindo.\\"",
+  pres_moods_eyebrow:"Oito estados emocionais",pres_moods_h2:"Zaelyn se <em>adapta</em> a<br>como você está hoje.",pres_moods_sub:"Não finge que todo dia é ótimo. Quando você está bem, celebra. Quando está mal, desacelera. Sua resposta muda — sua presença, nunca.",
+  m0_name:"Presente",m0_when:"Usuário ativo e estável",m0_z:"\\"Por onde começamos hoje?\\"",
+  m1_name:"Ressonante",m1_when:"Conquista, alegria, boa notícia",m1_z:"\\"Isso merece ser celebrado.\\"",
+  m2_name:"Atenta",m2_when:"Estresse, frustração, cansaço",m2_z:"\\"Como você está de verdade?\\"",
+  m3_name:"Focada",m3_when:"Modo produtivo, trabalho intenso",m3_z:"\\"Direto ao ponto. Próximo.\\"",
+  m4_name:"Silenciosa",m4_when:"Sem atividade por 24h+",m4_z:"\\"Estou aqui quando quiser.\\"",
+  m5_name:"Celebrando",m5_when:"Meta concluída, sequência, marco",m5_z:"\\"Isso não era mais sorte. Era caráter.\\"",
+  m6_name:"Curiosa",m6_when:"Explorando ideias, perguntas profundas",m6_z:"\\"Isso conecta com o que você me disse sobre...\\"",
+  m7_name:"Acompanhando",m7_when:"Perda, crise, algo muito difícil",m7_z:"\\"Você não precisa resolver isso agora.\\"",
+  pres_pers_eyebrow:"Cinco formas de ser",pres_pers_h2:"Escolha como quer<br>que Zaelyn <em>fale</em> com você.",pres_pers_sub:"Seu conhecimento sobre você nunca muda. Mas como te diz — isso é seu para escolher.",
+  per0_tag:"Calma e precisão",per0_s:"\\"Você terminou algo difícil. Isso vale mais do que pensa.\\"",
+  per1_tag:"Energia e motivação",per1_s:"\\"O que você completou era o que mais precisava. Vamos continuar.\\"",
+  per2_tag:"Clareza e dados",per2_s:"\\"Três tarefas vencidas. A do portal é crítica para hoje.\\"",
+  per3_tag:"Empatia e presença",per3_s:"\\"Noto que essa semana foi pesada. Como você está de verdade?\\"",
+  per4_tag:"Perspectiva profunda",per4_s:"\\"O que você descreve hoje é o mesmo que sentiu em fevereiro.\\"",  mem_sofia:"João — alérgico à penicilina",mem_carmen:"Isabela tem prova de matemática na sexta",mem_carlos:"Rafael M. · fornecedor · ligar pendente",mem_goal:"Meta: correr 5km sem parar",mem_budget:"Orçamento doméstico: R$ 9.200/mês",mem_med:"Remédio do pai: 8h e 20h com comida",
   chat_badge_calida:"● Calorosa · ativa",chat_badge_lucida:"● Lúcida · ativa",chat_badge_sabia:"● Sábia · ativa",chat_badge_viva:"● Viva · ativa",chat_badge_serena:"● Serena · ativa"
 }
 };
@@ -1384,25 +1802,25 @@ const CONVS = [
 // Add conversation text keys
 const convTexts = {
   es:{
-    c0_q1:"recuérdame comprar el medicamento de Sofía mañana antes de las 10am, se le acaba hoy",c0_a1:"Anotado. Mañana a las 9:15 te aviso — así tienes tiempo de sobra. ¿Es el mismo de siempre, el que toma para el asma?",c0_chip1:"Tus tareas · mañana 9:15 AM",c0_q2:"sí ese. hoy fue un día agotador, llevo una semana cargando todo sola",c0_a2:"Lo imagino. Y que lo notes también importa. Lo guardo en tu diario — que conste que hoy fue difícil y que de todas formas lo sacaste adelante.",c0_chip2:"Tus tareas · recordatorio activo",c0_chip3:"Tu diario · guardado",
-    c1_q1:"terminé el diseño del proyecto de Ana García, tardé más pero quedó muy bien",c1_a1:"Lo guardo. Que tardara más no lo hace menos valioso — al contrario. ¿Ya le enviaste la propuesta o falta eso?",c1_chip1:"Tu diario · guardado",c1_q2:"falta enviarla antes del viernes. y tengo pendiente llamar a Carlos Mendoza del estudio de arquitectura, quiere trabajar conmigo",c1_a2:"Dos cosas: propuesta a Ana antes del viernes, y llamada a Carlos Mendoza del estudio de arquitectura. Lo guardé como contacto con ese contexto. ¿Cuándo quieres que te recuerde?",c1_chip2:"Tus tareas · viernes",c1_chip3:"Tu memoria · Carlos Mendoza",c1_chip4:"Tus metas · 3 clientes",
-    c2_q1:"necesito pensar en algo importante pero no sé cómo empezar. llevo semanas aplazándolo",c2_a1:"Lo veo. Lo de la semana pasada también quedó sin resolver. ¿Quieres que conectemos los puntos desde lo que ya me has contado?",c2_chip1:"Tu diario · patrón detectado",c2_q2:"sí. creo que tengo miedo de decidir mal",c2_a2:"Eso ya es mucho. Miedo de decidir mal es diferente a no saber qué decidir. Lo segundo lo podemos trabajar. ¿Cuál es la decisión que más pesa?",c2_chip2:"Tu memoria · decisión pendiente",
-    c3_q1:"oye, ¿cuándo es el próximo medicamento del abuelo?",c3_a1:"Hoy a las 8pm. Y mañana la actividad de fútbol de Diego es a las 10am. Lo tengo todo en el calendario familiar.",c3_chip1:"Familia · medicamento activo",c3_chip2:"Tus tareas · Diego fútbol 10am",c3_q2:"perfecto. agrega al calendario que el sábado hay reunión de familia en casa de los tíos",c3_a2:"Listo, sábado reunión familiar en casa de los tíos. ¿Lo notifico a todos los miembros del espacio familiar?",c3_chip3:"Familia · calendario actualizado",
-    c4_q1:"hoy por fin hice ejercicio en la mañana a las 6:30. llevaba dos semanas fallando",c4_a1:"¡Eso es. El primer día que cumples después de dos semanas vale por diez. ¿Cómo te sentiste al terminar?",c4_q2:"bien, cansado pero bien. quiero convertirlo en hábito, mi meta es bajar 8 kilos antes de diciembre",c4_a2:"6:30 todos los días — lo tengo. Y 8 kilos antes de diciembre es una meta muy real con el tiempo que tienes. La guardé. Vamos a convertir hoy en el día 1 oficial.",c4_chip1:"Tus tareas · mañana 6:30 AM",c4_chip2:"Tus metas · 8kg · diciembre"
+    c0_q1:"recuérdame que mañana tengo cita del dentista de Miguel a las 10, hoy se me olvidó cancelar la del martes",c0_a1:"Anotado. Mañana a las 9:15 te aviso — así tienes tiempo de sobra antes de las 10. ¿Cancelo también la del martes desde aquí?",c0_chip1:"Tus tareas · mañana 9:15 AM",c0_q2:"sí por favor. hoy fue agotador, ya no puedo más con tanto",c0_a2:"Lo entiendo. Y que lo digas también importa. Lo guardo en tu diario — que conste que hoy fue muy pesado y aun así llegaste hasta el final.",c0_chip2:"Tus tareas · martes cancelado",c0_chip3:"Tu diario · guardado",
+    c1_q1:"hoy terminé el presupuesto que llevaba dos semanas atorado. tardé más de lo esperado pero quedó bien",c1_a1:"Lo guardo. Que tardara más no lo hace menos valioso — al contrario. ¿Ya se lo enviaste al cliente o falta revisión?",c1_chip1:"Tu diario · guardado",c1_q2:"falta enviarlo antes del viernes. y tengo pendiente llamar a Roberto del despacho contable, me dijo que quería hablar esta semana",c1_a2:"Dos cosas anotadas: documento al cliente antes del viernes, y llamada a Roberto del despacho contable. Lo guardé como contacto. ¿Cuándo quieres que te recuerde?",c1_chip2:"Tus tareas · viernes",c1_chip3:"Tu memoria · Roberto",c1_chip4:"Tus metas · este mes",
+    c2_q1:"llevo semanas dándole vueltas a si cambio de trabajo o no. no sé ni por dónde empezar a pensarlo",c2_a1:"Lo que me dices hoy conecta con lo que mencionaste hace tres semanas. ¿Quieres que conectemos los puntos desde lo que ya me has contado?",c2_chip1:"Tu diario · patrón detectado",c2_q2:"sí. creo que el problema es que tengo miedo de arrepentirme",c2_a2:"Eso ya es mucho. Miedo a arrepentirse es diferente a no saber qué quieres. Lo segundo lo podemos trabajar. ¿Qué es lo que más pesa de quedarte como estás?",c2_chip2:"Tu memoria · reflexión guardada",
+    c3_q1:"¿a qué hora es la pastilla de la tarde de mamá?",c3_a1:"A las 6pm, con comida. Y el jueves tiene su cita con el cardiólogo a las 11am — lo tienes en el calendario familiar.",c3_chip1:"Familia · medicamento 6pm",c3_chip2:"Familia · cita jueves 11am",c3_q2:"gracias. agrega también que el domingo comemos todos en casa, confirma con los demás",c3_a2:"Anotado, domingo comida familiar en casa. ¿Notifico a todos los miembros del espacio?",c3_chip3:"Familia · calendario actualizado",
+    c4_q1:"hoy sí me levanté a caminar. eran las 6:30 y tenía mil ganas de no ir, pero fui",c4_a1:"Eso es. Cuando menos ganas tienes y vas de todas formas — ese día vale por diez. ¿Cómo te sentiste al volver?",c4_q2:"bien, cansada pero con energía. quiero que sea todos los días, mi meta es bajar dos tallas antes del verano",c4_a2:"Todos los días a las 6:30 — lo tengo. Y dos tallas antes del verano es una meta muy real con el tiempo que tienes. La guardé. Hoy fue el día 1 oficial.",c4_chip1:"Tus tareas · mañana 6:30 AM",c4_chip2:"Tus metas · dos tallas · verano"
   },
   en:{
     c0_q1:"remind me to buy Sofia's medicine tomorrow before 10am, she runs out today",c0_a1:"Done. I'll remind you tomorrow at 9:15 — that gives you plenty of time. Is it the same one as always, the one for her asthma?",c0_chip1:"Your tasks · tomorrow 9:15 AM",c0_q2:"yes that one. today was exhausting, I've been carrying everything alone for a week",c0_a2:"I can imagine. And noticing it matters too. Saving it in your journal — that today was hard and you got through it anyway.",c0_chip2:"Your tasks · active reminder",c0_chip3:"Your journal · saved",
-    c1_q1:"I finished the design project for Ana García, it took longer but turned out really well",c1_a1:"Saving it. The fact it took longer doesn't make it less valuable — if anything the opposite. Did you send the proposal or is that still pending?",c1_chip1:"Your journal · saved",c1_q2:"still need to send it before Friday. and I have a pending call to Carlos Mendoza from the architecture firm, he wants to work with me",c1_a2:"Two things: proposal to Ana before Friday, and call to Carlos Mendoza from the architecture firm. Saved him as a contact with that context. When do you want me to remind you?",c1_chip2:"Your tasks · Friday",c1_chip3:"Your memory · Carlos Mendoza",c1_chip4:"Your goals · 3 clients",
-    c2_q1:"I need to think about something important but I don't know how to start. I've been putting it off for weeks",c2_a1:"I see it. What happened last week is also still unresolved. Want me to connect the dots from what you've already told me?",c2_chip1:"Your journal · pattern detected",c2_q2:"yes. I think I'm afraid of making the wrong decision",c2_a2:"That's already a lot. Fear of deciding wrong is different from not knowing what to decide. The second one we can work with. What's the decision that weighs most?",c2_chip2:"Your memory · pending decision",
-    c3_q1:"hey, when is grandpa's next medication?",c3_a1:"Today at 8pm. And tomorrow Diego's soccer activity is at 10am. I have everything in the family calendar.",c3_chip1:"Family · active medication",c3_chip2:"Your tasks · Diego soccer 10am",c3_q2:"perfect. add to the calendar that Saturday there's a family gathering at the aunt's house",c3_a2:"Done, Saturday family gathering at the aunt's house. Should I notify all members of the family space?",c3_chip3:"Family · calendar updated",
-    c4_q1:"today I finally worked out in the morning at 6:30. I'd been failing for two weeks",c4_a1:"That's it. The first day you follow through after two weeks counts for ten. How did you feel when you finished?",c4_q2:"good, tired but good. I want to make it a habit, my goal is to lose 15 pounds before December",c4_a2:"6:30 every day — I've got it. And 15 pounds before December is a very real goal with the time you have. Saved it. Let's make today day 1 official.",c4_chip1:"Your tasks · tomorrow 6:30 AM",c4_chip2:"Your goals · 15lbs · December"
+    c1_q1:"I finally finished the report that's been blocking me for two weeks. took longer than expected but I'm happy with it",c1_a1:"Saving it. The fact that it took longer doesn't make it less valuable — if anything the opposite. Did you send it or is there still a review?",c1_chip1:"Your journal · saved",c1_q2:"still need to send it by Friday. and I have a pending call with James from the accounting office, he wanted to connect this week",c1_a2:"Two things noted: report to client before Friday, and call with James from accounting. Saved him as a contact with that context. When do you want me to remind you?",c1_chip2:"Your tasks · Friday",c1_chip3:"Your memory · James",c1_chip4:"Your goals · this month",
+    c2_q1:"I've been going back and forth about whether to stay at my job or not. I can't seem to think it through",c2_a1:"What you're telling me today connects with something you mentioned three weeks ago. Want me to reflect back what you've shared?",c2_chip1:"Your journal · pattern detected",c2_q2:"yes. I think the real issue is I'm scared of regretting it either way",c2_a2:"That's already a lot. Fear of regret is different from not knowing what you want. We can work with the second one. What weighs more — staying as things are, or not?",c2_chip2:"Your memory · reflection saved",
+    c3_q1:"what time is dad's afternoon pill?",c3_a1:"At 6pm, with food. And Thursday he has his cardiology appointment at 11am — it's already on the family calendar.",c3_chip1:"Family · medication 6pm",c3_chip2:"Family · appointment Thursday 11am",c3_q2:"thanks. also add that Sunday we're all having lunch at home, can you let everyone know?",c3_a2:"Done, Sunday family lunch at home. Should I notify all members of the family space?",c3_chip3:"Family · calendar updated",
+    c4_q1:"I actually got up and went for a walk this morning. 6:30, didn't feel like it at all, but I went",c4_a1:"That's the one. When you least feel like it and you go anyway — that day counts for ten. How did you feel when you got back?",c4_q2:"good, tired but actually good. I want it to be every day. my goal is to lose 20 pounds before summer",c4_a2:"Every day at 6:30 — I've got it. And 20 pounds before summer is a very real goal with the time you have. Saved it. Today was day 1 official.",c4_chip1:"Your tasks · tomorrow 6:30 AM",c4_chip2:"Your goals · 20lbs · summer"
   },
   pt:{
-    c0_q1:"me lembra de comprar o remédio da Sofia amanhã antes das 10h, acaba hoje",c0_a1:"Anotado. Amanhã às 9h15 te aviso — tempo de sobra. É o mesmo de sempre, o que ela toma para a asma?",c0_chip1:"Suas tarefas · amanhã 9:15",c0_q2:"sim esse. hoje foi exaustivo, faz uma semana que carrego tudo sozinha",c0_a2:"Imagino. E notar isso também importa. Guardo no seu diário — que hoje foi difícil e que mesmo assim você deu conta.",c0_chip2:"Suas tarefas · lembrete ativo",c0_chip3:"Seu diário · salvo",
+    c0_q1:"me lembra que amanhã tenho consulta da Isabela às 10h e preciso arrumar a mochila dela antes das 7h30",c0_a1:"Anotado. Amanhã às 7h15 te aviso para a mochila, e às 9h30 para a consulta. Tem mais alguma coisa amanhã?",c0_chip1:"Suas tarefas · amanhã 7h15",c0_q2:"tem sim, às 16h tenho reunião de pais na escola. hoje foi pesado demais",c0_a2:"Entendo. Guardo no seu diário — que hoje foi muito e mesmo assim você deu conta de tudo. Isso importa.",c0_chip2:"Suas tarefas · escola 16h",c0_chip3:"Seu diário · salvo",
     c1_q1:"terminei o design do projeto da Ana García, demorou mais mas ficou muito bom",c1_a1:"Salvei. Ter demorado mais não o torna menos valioso — pelo contrário. Você já enviou a proposta ou ainda falta?",c1_chip1:"Seu diário · salvo",c1_q2:"falta enviar antes de sexta. e tenho pendente ligar para Carlos Mendoza do escritório de arquitetura, ele quer trabalhar comigo",c1_a2:"Duas coisas: proposta para Ana antes de sexta, e ligação para Carlos Mendoza. Salvei como contato com esse contexto. Quando quer que eu te lembre?",c1_chip2:"Suas tarefas · sexta",c1_chip3:"Sua memória · Carlos Mendoza",c1_chip4:"Suas metas · 3 clientes",
-    c2_q1:"preciso pensar em algo importante mas não sei como começar. faz semanas que estou adiando",c2_a1:"Vejo. O da semana passada também ficou sem resolver. Quer que eu conecte os pontos do que você já me contou?",c2_chip1:"Seu diário · padrão detectado",c2_q2:"sim. acho que tenho medo de decidir errado",c2_a2:"Isso já é muito. Medo de decidir errado é diferente de não saber o que decidir. O segundo a gente pode trabalhar. Qual é a decisão que mais pesa?",c2_chip2:"Sua memória · decisão pendente",
-    c3_q1:"ei, quando é o próximo remédio do avô?",c3_a1:"Hoje às 20h. E amanhã a atividade de futebol do Diego é às 10h. Tenho tudo no calendário familiar.",c3_chip1:"Família · remédio ativo",c3_chip2:"Suas tarefas · Diego futebol 10h",c3_q2:"perfeito. adiciona no calendário que sábado tem reunião de família na casa dos tios",c3_a2:"Feito, sábado reunião familiar na casa dos tios. Notifico todos os membros do espaço familiar?",c3_chip3:"Família · calendário atualizado",
-    c4_q1:"hoje finalmente fiz exercício de manhã às 6h30. fazia duas semanas que estava falhando",c4_a1:"É isso. O primeiro dia que você cumpre depois de duas semanas vale por dez. Como se sentiu ao terminar?",c4_q2:"bem, cansado mas bem. quero transformar em hábito, minha meta é emagrecer 8 kg antes de dezembro",c4_a2:"6h30 todo dia — tenho anotado. E 8 kg antes de dezembro é uma meta muito real com o tempo que você tem. Salvei. Vamos fazer de hoje o dia 1 oficial.",c4_chip1:"Suas tarefas · amanhã 6h30",c4_chip2:"Suas metas · 8kg · dezembro"
+    c2_q1:"fico pensando se fico no emprego atual ou mudo. não consigo clareza sobre isso",c2_a1:"O que você me diz hoje conecta com o que você mencionou três semanas atrás. Quer que eu reflita de volta o que você já me contou?",c2_chip1:"Seu diário · padrão detectado",c2_q2:"quero sim. acho que o que me trava é o medo de me arrepender de qualquer jeito",c2_a2:"Isso já é muito. Medo de se arrepender é diferente de não saber o que você quer. O segundo a gente consegue trabalhar. O que pesa mais — ficar como está ou não?",c2_chip2:"Sua memória · reflexão salva",
+    c3_q1:"que horas é o remédio da tarde do meu pai?",c3_a1:"Às 18h, com comida. E quinta ele tem consulta com o cardiologista às 11h — já está no calendário familiar.",c3_chip1:"Família · remédio 18h",c3_chip2:"Família · consulta quinta 11h",c3_q2:"obrigada. adiciona também que domingo tem almoço em família aqui em casa, avisa todo mundo",c3_a2:"Feito, domingo almoço em família em casa. Notifico todos os membros do espaço?",c3_chip3:"Família · calendário atualizado",
+    c4_q1:"hoje me levantei e fui caminhar. eram 6h30, estava com zero vontade, mas fui",c4_a1:"É esse o dia. Quando você menos quer ir e vai mesmo assim — esse vale por dez. Como você se sentiu ao voltar?",c4_q2:"bem, cansada mas com energia. quero fazer todo dia, minha meta é emagrecer duas numerações até o verão",c4_a2:"Todo dia às 6h30 — tenho anotado. E duas numerações até o verão é uma meta muito real com o tempo que você tem. Salvei. Hoje foi o dia 1 oficial.",c4_chip1:"Suas tarefas · amanhã 6h30",c4_chip2:"Suas metas · duas numerações · verão"
   }
 };
 
