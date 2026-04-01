@@ -37,6 +37,41 @@ export async function validateInviteCode(code: string) {
 
 // Conversation history
 export async function getConversations() {
-  const res = await fetch("/api/auth/me"); // TODO: replace with conversations endpoint
   return [];
+}
+
+// Telegram linking
+export async function getTelegramLinkCode(): Promise<{ code: string; expiresIn: number } | null> {
+  const res = await fetch("/api/portal/telegram/link-code", { cache: "no-store" });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function getTelegramLinkStatus(): Promise<{ linked: boolean; username?: string }> {
+  const res = await fetch("/api/portal/telegram/link-status", { cache: "no-store" });
+  if (!res.ok) return { linked: false };
+  return res.json();
+}
+
+// Phantom Mode
+export async function startPhantom(subMode: "pure" | "selective" | "encrypted"): Promise<{
+  anonToken: string;
+  expiresAt: string;
+  subMode: string;
+} | null> {
+  const res = await fetch("/api/portal/phantom/start", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ subMode }),
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function endPhantom(anonToken: string): Promise<void> {
+  await fetch("/api/portal/phantom/end", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ anonToken }),
+  });
 }
