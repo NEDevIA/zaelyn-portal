@@ -7,16 +7,21 @@ import { ArrowRight } from "@phosphor-icons/react";
 import { sendMagicLink } from "@/lib/api";
 import ZaelynLogo from "@/components/ui/ZaelynLogo";
 
+type SentState = "sent" | "waiting" | "not_found" | false;
+
 function LoginForm() {
   const params = useSearchParams();
   const errorParam = params.get("error");
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [sent, setSent] = useState<SentState>(false);
   const [error, setError] = useState<string | null>(
-    errorParam === "invalid_token" ? "El link expiró o no es válido. Intenta de nuevo." :
-    errorParam === "missing_token" ? "Link incompleto. Intenta de nuevo." : null
+    errorParam === "invalid_token"
+      ? "El link expiró o no es válido. Intenta de nuevo."
+      : errorParam === "missing_token"
+        ? "Link incompleto. Intenta de nuevo."
+        : null
   );
 
   async function handleSubmit(e: React.FormEvent) {
@@ -25,10 +30,29 @@ function LoginForm() {
     setLoading(true);
     setError(null);
     try {
+      // 1. Verificar si el email tiene acceso aprobado
+      const check = await fetch("/api/auth/check-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
+        .then((r) => r.json())
+        .catch(() => ({ status: "approved" }));
+
+      if (check.status === "waiting") {
+        setSent("waiting");
+        return;
+      }
+      if (check.status === "not_found") {
+        setSent("not_found");
+        return;
+      }
+
+      // 2. Aprobado → enviar magic link
       await sendMagicLink(email);
-      setSent(true);
+      setSent("sent");
     } catch {
-      setError("No pudimos enviar el link. Intenta de nuevo.");
+      setError("No pudimos verificar tu acceso. Intenta de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -43,7 +67,8 @@ function LoginForm() {
         {/* Logo */}
         <ZaelynLogo href="/" size={24} />
 
-        {sent ? (
+        {/* Estado: magic link enviado */}
+        {sent === "sent" && (
           <div className="flex flex-col gap-4">
             <h1
               className="text-2xl font-medium"
@@ -52,7 +77,8 @@ function LoginForm() {
               Revisa tu correo.
             </h1>
             <p className="text-[15px] leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
-              Te enviamos un link a <strong style={{ color: "var(--foreground)" }}>{email}</strong>.
+              Te enviamos un link a{" "}
+              <strong style={{ color: "var(--foreground)" }}>{email}</strong>.
               Tienes 15 minutos para usarlo.
             </p>
             <div
@@ -72,7 +98,70 @@ function LoginForm() {
               </p>
             </div>
           </div>
-        ) : (
+        )}
+
+        {/* Estado: en lista de espera */}
+        {sent === "waiting" && (
+          <div className="flex flex-col gap-4">
+            <h1
+              className="text-2xl font-medium"
+              style={{ color: "var(--foreground)", fontFamily: "var(--font-dm-sans)" }}
+            >
+              Ya estás en nuestra lista.
+            </h1>
+            <p className="text-[15px] leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+              Te avisamos en cuanto tengamos un lugar para ti. Gracias por tu paciencia.
+            </p>
+            <div
+              className="p-4 rounded-xl"
+              style={{ background: "rgba(129,140,248,0.06)", border: "1px solid rgba(129,140,248,0.15)" }}
+            >
+              <p className="text-[13px]" style={{ color: "var(--muted-foreground)" }}>
+                ¿Cambiaste de email?{" "}
+                <button
+                  onClick={() => setSent(false)}
+                  className="underline"
+                  style={{ color: "#818cf8" }}
+                >
+                  Intenta con otro correo
+                </button>
+                .
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Estado: no está en ninguna lista */}
+        {sent === "not_found" && (
+          <div className="flex flex-col gap-4">
+            <h1
+              className="text-2xl font-medium"
+              style={{ color: "var(--foreground)", fontFamily: "var(--font-dm-sans)" }}
+            >
+              Zaelyn está en beta cerrada.
+            </h1>
+            <p className="text-[15px] leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+              Únete a la lista de espera y te avisamos cuando sea tu turno.
+            </p>
+            <a
+              href="https://zaelyn.ai/#beta"
+              className="h-12 px-5 rounded-xl text-[14px] font-medium flex items-center justify-center gap-2 transition-all duration-200"
+              style={{ background: "#6366f1", color: "#ffffff", textDecoration: "none" }}
+            >
+              Unirme a la lista →
+            </a>
+            <button
+              onClick={() => setSent(false)}
+              className="text-[13px] text-center"
+              style={{ color: "var(--muted-foreground)" }}
+            >
+              ← Volver
+            </button>
+          </div>
+        )}
+
+        {/* Estado: formulario */}
+        {!sent && (
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <h1
@@ -117,15 +206,12 @@ function LoginForm() {
                   cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
-                {loading ? "Enviando..." : "Enviarme el link"}
+                {loading ? "Verificando..." : "Enviarme el link"}
                 {!loading && <ArrowRight size={14} />}
               </button>
             </form>
 
-            <div
-              className="w-full h-px"
-              style={{ background: "var(--border)" }}
-            />
+            <div className="w-full h-px" style={{ background: "var(--border)" }} />
 
             <Link
               href="/join"

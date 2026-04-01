@@ -5,6 +5,7 @@ import ChatThread from "@/components/chat/ChatThread";
 import Composer from "@/components/chat/Composer";
 import WelcomeMessage from "@/components/chat/WelcomeMessage";
 import DailyGreeting from "@/components/chat/DailyGreeting";
+import TelegramBanner from "@/components/chat/TelegramBanner";
 import { useChatStore } from "@/store/useChatStore";
 import { usePhantomStore } from "@/store/usePhantomStore";
 import { useRightPanelStore } from "@/store/useRightPanelStore";
@@ -180,6 +181,9 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-full">
+      {/* Cambio 4: Banner Telegram — discreto, cierra con X, persiste en localStorage */}
+      <TelegramBanner hasTelegram={!!user?.telegramId} />
+
       {/* PASO 5: First-ever welcome (one time) */}
       {firstMsgData?.isFirstEver && (
         <WelcomeMessage

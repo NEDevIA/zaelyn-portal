@@ -7,6 +7,8 @@ export interface ZaelynUser {
   plan: "beta" | "free" | "pro";
   persona?: string;
   privacyMode?: "comfort" | "sovereign" | "phantom" | "full_sovereign";
+  telegramId?: number | null;
+  telegramUsername?: string | null;
 }
 
 interface AuthStore {
