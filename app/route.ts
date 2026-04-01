@@ -1525,9 +1525,21 @@ footer {
   <div class="eyebrow reveal" style="justify-content:center" data-i18n="cta_eyebrow">Beta por invitación</div>
   <h2 class="reveal reveal-d1" data-i18n="cta_h2">Empieza a construir<br>tu <em>segunda mente.</em></h2>
   <p class="reveal reveal-d2" data-i18n="cta_sub">Zaelyn está en beta. Los primeros usuarios definen el producto. Entra por invitación y sé parte del origen.</p>
-  <div class="cta-buttons reveal reveal-d2">
-    <button class="btn-cta-primary" onclick="goToChat()" data-i18n="cta_btn1">Pedir invitación beta</button>
-    <button class="btn-cta-ghost" onclick="window.open('http://national.expert','_blank')" data-i18n="cta_btn2">Contactar NE America →</button>
+  <div class="reveal reveal-d2" style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:420px;margin:0 auto">
+    <form id="waitlist-form" onsubmit="submitWaitlist(event)" style="display:flex;gap:8px;width:100%">
+      <input id="waitlist-email" type="email" required
+        data-i18n-placeholder="cta_email_placeholder"
+        placeholder="tu@email.com"
+        style="flex:1;height:48px;padding:0 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:#fff;font-size:14px;outline:none;font-family:var(--font-dm-sans)"
+        onfocus="this.style.borderColor='rgba(129,140,248,0.5)'"
+        onblur="this.style.borderColor='rgba(255,255,255,0.12)'" />
+      <button type="submit" id="waitlist-btn"
+        style="height:48px;padding:0 20px;border-radius:12px;background:#6366f1;color:#fff;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:var(--font-dm-sans);border:none"
+        data-i18n="cta_btn1">Quiero acceso →</button>
+    </form>
+    <p id="waitlist-msg" style="display:none;font-size:13px;color:rgba(255,255,255,0.65);text-align:center"></p>
+    <p id="waitlist-count" style="display:none;font-size:12px;color:rgba(255,255,255,0.35);text-align:center"></p>
+    <button class="btn-cta-ghost" onclick="window.open('http://national.expert','_blank')" data-i18n="cta_btn2" style="margin-top:4px">Contactar NE America →</button>
   </div>
 </div>
 
@@ -1590,7 +1602,7 @@ es:{
   lang_ex_en:"\\"I know you've been thinking about this for days. Let me reflect back what you've told me.\\"",lang_ex_es:"\\"Sé que llevas días dándole vueltas a esto. Déjame reflejar lo que me has contado.\\"",lang_ex_pt:"\\"Sei que você está pensando nisso há dias. Deixa eu refletir o que você me contou.\\"",
   cmp_eyebrow:"Posicionamiento",cmp_h2:"Zaelyn no compite.\\nResuelve algo distinto.",cmp_sub:"Hay IA que te vigila. Hay IA privada pero amnésica. Zaelyn es el primero en su categoría: <strong>Inteligencia de Presencia.</strong>",
   c_dim:"Dimensión",c_s1:"Privacidad",c_s2:"Memoria",c_s3:"Acceso",c_r1:"Tus datos",c_r1a:"Guarda todo",c_r1b:"No guarda nada",c_r1c:"Tú decides",c_r2:"Verificable",c_r2b:"TEE + E2EE",c_r2c:"Phantom",c_new:"nuevo",c_r3:"Te conoce",c_r3a:"Historial básico",c_r3b:"No · amnésica",c_r3c:"4 módulos de vida real",c_unique:"único",c_r4:"Estado emocional",c_r4c:"Detecta y adapta",c_r5:"Canales",c_r6:"Idiomas",c_r6a:"Inglés",c_adv:"ventaja",
-  cta_eyebrow:"Beta por invitación",cta_h2:"Empieza a construir\\ntu segunda mente.",cta_sub:"Zaelyn está en beta. Los primeros usuarios definen el producto. Entra por invitación y sé parte del origen.",cta_btn1:"Pedir invitación beta",cta_btn2:"Contactar NE America →",
+  cta_eyebrow:"Beta por invitación",cta_h2:"Empieza a construir\\ntu segunda mente.",cta_sub:"Zaelyn está en beta. Los primeros usuarios definen el producto. Entra por invitación y sé parte del origen.",cta_btn1:"Quiero acceso →",cta_btn2:"Contactar NE America →",cta_email_placeholder:"tu@email.com",waitlist_ok:"Anotado. Te avisamos pronto.",waitlist_already:"Ya estás en la lista.",waitlist_error:"Algo salió mal. Intenta de nuevo.",waitlist_count:"{{n}} personas esperando acceso",
   f_priv:"Privacidad",f_terms:"Términos",
 
   pres_quote:"Antes de preguntarte qué tienes pendiente,<br>Zaelyn <em>siente</em> cómo llegaste hoy.",
@@ -1651,7 +1663,7 @@ en:{
   lang_ex_en:"\\"I know you've been thinking about this for days. Let me reflect back what you've told me.\\"",lang_ex_es:"\\"Sé que llevas días dándole vueltas a esto. Déjame reflejar lo que me has contado.\\"",lang_ex_pt:"\\"Sei que você está pensando nisso há dias. Deixa eu refletir o que você me contou.\\"",
   cmp_eyebrow:"Positioning",cmp_h2:"Zaelyn doesn't compete.\\nIt solves something different.",cmp_sub:"There's AI that watches you. There's private AI that's amnesic. Zaelyn is first in its category: <strong>Presence Intelligence.</strong>",
   c_dim:"Dimension",c_s1:"Privacy",c_s2:"Memory",c_s3:"Access",c_r1:"Your data",c_r1a:"Saves everything",c_r1b:"Saves nothing",c_r1c:"You decide",c_r2:"Verifiable",c_r2b:"TEE + E2EE",c_r2c:"Phantom",c_new:"new",c_r3:"Knows you",c_r3a:"Basic history",c_r3b:"No · amnesic",c_r3c:"4 real-life modules",c_unique:"unique",c_r4:"Emotional state",c_r4c:"Detects and adapts",c_r5:"Channels",c_r6:"Languages",c_r6a:"English",c_adv:"advantage",
-  cta_eyebrow:"Beta by invitation",cta_h2:"Start building\\nyour second mind.",cta_sub:"Zaelyn is in beta. The first users define the product. Join by invitation and be part of the origin.",cta_btn1:"Request beta invitation",cta_btn2:"Contact NE America →",
+  cta_eyebrow:"Beta by invitation",cta_h2:"Start building\\nyour second mind.",cta_sub:"Zaelyn is in beta. The first users define the product. Join by invitation and be part of the origin.",cta_btn1:"Request access →",cta_btn2:"Contact NE America →",cta_email_placeholder:"your@email.com",waitlist_ok:"Got it. We'll let you know soon.",waitlist_already:"You're already on the list.",waitlist_error:"Something went wrong. Try again.",waitlist_count:"{{n}} people waiting for access",
   f_priv:"Privacy",f_terms:"Terms",
 
   pres_quote:"Before asking what you have pending,<br>Zaelyn <em>feels</em> how you arrived today.",
@@ -1712,7 +1724,7 @@ pt:{
   lang_ex_en:"\\"I know you've been thinking about this for days. Let me reflect back what you've told me.\\"",lang_ex_es:"\\"Sé que llevas días dándole vueltas a esto. Déjame reflejar lo que me has contado.\\"",lang_ex_pt:"\\"Sei que você está pensando nisso há dias. Deixa eu refletir o que você me contou.\\"",
   cmp_eyebrow:"Posicionamento",cmp_h2:"Zaelyn não compete.\\nResolve algo diferente.",cmp_sub:"Há IA que te vigia. Há IA privada mas amnésica. Zaelyn é o primeiro em sua categoria: <strong>Inteligência de Presença.</strong>",
   c_dim:"Dimensão",c_s1:"Privacidade",c_s2:"Memória",c_s3:"Acesso",c_r1:"Seus dados",c_r1a:"Salva tudo",c_r1b:"Não salva nada",c_r1c:"Você decide",c_r2:"Verificável",c_r2b:"TEE + E2EE",c_r2c:"Phantom",c_new:"novo",c_r3:"Te conhece",c_r3a:"Histórico básico",c_r3b:"Não · amnésica",c_r3c:"4 módulos de vida real",c_unique:"único",c_r4:"Estado emocional",c_r4c:"Detecta e adapta",c_r5:"Canais",c_r6:"Idiomas",c_r6a:"Inglês",c_adv:"vantagem",
-  cta_eyebrow:"Beta por convite",cta_h2:"Comece a construir\\nsua segunda mente.",cta_sub:"Zaelyn está em beta. Os primeiros usuários definem o produto. Entre por convite e seja parte da origem.",cta_btn1:"Pedir convite beta",cta_btn2:"Contatar NE America →",
+  cta_eyebrow:"Beta por convite",cta_h2:"Comece a construir\\nsua segunda mente.",cta_sub:"Zaelyn está em beta. Os primeiros usuários definem o produto. Entre por convite e seja parte da origem.",cta_btn1:"Quero acesso →",cta_btn2:"Contatar NE America →",cta_email_placeholder:"seu@email.com",waitlist_ok:"Anotado. Vamos te avisar em breve.",waitlist_already:"Você já está na lista.",waitlist_error:"Algo deu errado. Tente novamente.",waitlist_count:"{{n}} pessoas aguardando acesso",
   f_priv:"Privacidade",f_terms:"Termos",
 
   pres_quote:"Antes de perguntar o que você tem pendente,<br>Zaelyn <em>sente</em> como você chegou hoje.",
@@ -1858,6 +1870,18 @@ function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const k = el.getAttribute('data-i18n');
     if (t[k] !== undefined) el.innerHTML = t[k];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const k = el.getAttribute('data-i18n-placeholder');
+    if (t[k] !== undefined) el.placeholder = t[k];
+  });
+  document.querySelectorAll('[data-i18n-bind]').forEach(el => {
+    const k = el.getAttribute('data-i18n-bind');
+    if (t[k] !== undefined) {
+      let text = t[k];
+      if (el.dataset.count) text = text.replace('{{n}}', el.dataset.count);
+      el.textContent = text;
+    }
   });
 }
 
@@ -2093,6 +2117,67 @@ document.addEventListener('DOMContentLoaded', () => {
 function goToChat() {
   window.location.href = '/chat';
 }
+
+// ─── WAITLIST FORM (Cambios 2 + 3) ───────────────────────────────────────
+const BOTIOS_URL = 'https://botios-staging.fly.dev';
+
+async function submitWaitlist(e) {
+  e.preventDefault();
+  const email = document.getElementById('waitlist-email').value.trim();
+  const btn   = document.getElementById('waitlist-btn');
+  const msg   = document.getElementById('waitlist-msg');
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    const res  = await fetch(BOTIOS_URL + '/api/v1/portal/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json().catch(() => ({}));
+    msg.style.display = 'block';
+    const t = { ...T[lang], ...convTexts[lang] };
+    if (res.ok) {
+      msg.textContent = t.waitlist_ok ?? 'Anotado. Te avisamos pronto.';
+    } else if (data?.code === 'already_registered') {
+      msg.textContent = t.waitlist_already ?? 'Ya estás en la lista.';
+    } else {
+      msg.textContent = t.waitlist_error ?? 'Algo salió mal. Intenta de nuevo.';
+    }
+    document.getElementById('waitlist-form').style.display = 'none';
+  } catch {
+    const t = { ...T[lang], ...convTexts[lang] };
+    const msg2 = document.getElementById('waitlist-msg');
+    msg2.style.display = 'block';
+    msg2.textContent = t.waitlist_error ?? 'Algo salió mal. Intenta de nuevo.';
+    btn.disabled = false;
+    applyTranslations();
+  }
+}
+
+async function loadWaitlistCount() {
+  try {
+    const res = await fetch(BOTIOS_URL + '/api/v1/portal/waitlist/count');
+    if (!res.ok) return;
+    const { count } = await res.json().catch(() => ({}));
+    if (count >= 100) {
+      const el = document.getElementById('waitlist-count');
+      if (!el) return;
+      el.style.display = 'block';
+      el.dataset.count = count;
+      el.dataset.i18nBind = 'waitlist_count';
+      applyTranslations();
+    }
+  } catch { /* silent */ }
+}
+
+const _betaSection = document.getElementById('beta');
+if (_betaSection) {
+  new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) loadWaitlistCount();
+  }, { threshold: 0.1 }).observe(_betaSection);
+}
+
 // Footer links
 document.querySelectorAll('[data-i18n="f_priv"]').forEach(a => a.href = '/privacy');
 document.querySelectorAll('[data-i18n="f_terms"]').forEach(a => a.href = '/terms');
