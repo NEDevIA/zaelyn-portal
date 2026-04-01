@@ -4,7 +4,7 @@ export interface ZaelynUser {
   id: string;
   email: string;
   name?: string;
-  plan: "beta" | "free" | "pro";
+  plan: "beta" | "free" | "pro" | "enterprise";
   persona?: string;
   privacyMode?: "comfort" | "sovereign" | "phantom" | "full_sovereign";
   telegramId?: number | null;
