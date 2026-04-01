@@ -8,7 +8,7 @@ export async function POST(request: Request) {
 
   const body = await request.json();
   const res = await fetch(
-    `${process.env.BACKEND_URL ?? "https://ne-botios-staging.fly.dev"}/api/v1/portal/phantom/start`,
+    `${process.env.BACKEND_URL ?? "https://botios-staging.fly.dev"}/api/v1/portal/phantom/start`,
     {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },

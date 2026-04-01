@@ -11,7 +11,7 @@ export async function GET() {
   if (!payload) return NextResponse.json({ error: "Token inválido" }, { status: 401 });
 
   const API =
-    process.env.NEXT_PUBLIC_API_URL ?? "https://ne-botios-staging.fly.dev";
+    process.env.NEXT_PUBLIC_API_URL ?? "https://botios-staging.fly.dev";
 
   const res = await fetch(`${API}/api/v1/portal/telegram/link-code`, {
     headers: {

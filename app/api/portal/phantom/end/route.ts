@@ -8,7 +8,7 @@ export async function DELETE(request: Request) {
 
   const body = await request.json();
   const res = await fetch(
-    `${process.env.BACKEND_URL ?? "https://ne-botios-staging.fly.dev"}/api/v1/portal/phantom/end`,
+    `${process.env.BACKEND_URL ?? "https://botios-staging.fly.dev"}/api/v1/portal/phantom/end`,
     {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
