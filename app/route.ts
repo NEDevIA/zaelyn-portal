@@ -970,7 +970,7 @@ footer {
       <option value="pt">PT</option>
     </select>
     <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
-    <button class="nav-cta" data-i18n="nav_cta">Empieza →</button>
+    <button class="nav-cta" onclick="goToChat()" data-i18n="nav_cta">Empieza →</button>
   </div>
 </nav>
 
@@ -992,7 +992,7 @@ footer {
     </h1>
     <p class="hero-sub" data-i18n="hero_sub">No es un chatbot que olvida. Es Zaelyn — la primera IA que construye una memoria real de tu vida y la protege como tú decides.</p>
     <div class="hero-actions">
-      <button class="btn-hero btn-hero-primary" data-i18n="hero_cta1">Empieza a hablar</button>
+      <button class="btn-hero btn-hero-primary" onclick="goToChat()" data-i18n="hero_cta1">Empieza a hablar</button>
       <button class="btn-hero btn-hero-ghost" onclick="document.getElementById('conoce').scrollIntoView({behavior:'smooth'})" data-i18n="hero_cta2">Ver cómo funciona ↓</button>
     </div>
     <div class="hero-proof">
@@ -1526,8 +1526,8 @@ footer {
   <h2 class="reveal reveal-d1" data-i18n="cta_h2">Empieza a construir<br>tu <em>segunda mente.</em></h2>
   <p class="reveal reveal-d2" data-i18n="cta_sub">Zaelyn está en beta. Los primeros usuarios definen el producto. Entra por invitación y sé parte del origen.</p>
   <div class="cta-buttons reveal reveal-d2">
-    <button class="btn-cta-primary" data-i18n="cta_btn1">Pedir invitación beta</button>
-    <button class="btn-cta-ghost" data-i18n="cta_btn2">Contactar NE America →</button>
+    <button class="btn-cta-primary" onclick="goToChat()" data-i18n="cta_btn1">Pedir invitación beta</button>
+    <button class="btn-cta-ghost" onclick="window.open('http://national.expert','_blank')" data-i18n="cta_btn2">Contactar NE America →</button>
   </div>
 </div>
 
@@ -2089,6 +2089,15 @@ document.addEventListener('DOMContentLoaded', () => {
   setupReveal();
   setupTilt();
 });
+
+function goToChat() {
+  window.location.href = '/chat';
+}
+// Footer links
+document.querySelectorAll('[data-i18n="f_priv"]').forEach(a => a.href = '/privacy');
+document.querySelectorAll('[data-i18n="f_terms"]').forEach(a => a.href = '/terms');
+document.querySelectorAll('[data-i18n="footer_priv"]').forEach(a => a.href = '/privacy');
+document.querySelectorAll('[data-i18n="footer_terms"]').forEach(a => a.href = '/terms');
 </script>
 </body>
 </html>`;
