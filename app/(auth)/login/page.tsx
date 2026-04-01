@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react";
 import { sendMagicLink } from "@/lib/api";
+import ZaelynLogo from "@/components/ui/ZaelynLogo";
 
 function LoginForm() {
   const params = useSearchParams();
@@ -40,14 +41,7 @@ function LoginForm() {
     >
       <div className="w-full max-w-[400px] flex flex-col gap-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <span
-            className="text-2xl font-medium tracking-tight"
-            style={{ fontFamily: "var(--font-dm-sans)", color: "var(--foreground)" }}
-          >
-            <span style={{ color: "#8b5cf6" }}>Zae</span>lyn
-          </span>
-        </Link>
+        <ZaelynLogo href="/" size={24} />
 
         {sent ? (
           <div className="flex flex-col gap-4">

@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react";
 import { validateInviteCode, sendMagicLink } from "@/lib/api";
+import ZaelynLogo from "@/components/ui/ZaelynLogo";
 
 export default function JoinPage() {
   const { code } = useParams<{ code: string }>();
@@ -44,14 +45,7 @@ export default function JoinPage() {
       style={{ background: "var(--background)" }}
     >
       <div className="w-full max-w-[420px] flex flex-col gap-8">
-        <Link href="/" className="flex items-center gap-2">
-          <span
-            className="text-2xl font-medium tracking-tight"
-            style={{ fontFamily: "var(--font-dm-sans)", color: "var(--foreground)" }}
-          >
-            <span style={{ color: "#8b5cf6" }}>Zae</span>lyn
-          </span>
-        </Link>
+        <ZaelynLogo href="/" size={24} />
 
         {status === "loading" && (
           <div className="flex items-center gap-3">

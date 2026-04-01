@@ -3,6 +3,7 @@
 import { useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import ZaelynLogo from "@/components/ui/ZaelynLogo";
 
 function VerifyContent() {
   const params = useSearchParams();
@@ -41,14 +42,7 @@ function VerifyContent() {
       style={{ background: "var(--background)" }}
     >
       <div className="w-full max-w-[400px] flex flex-col gap-6">
-        <Link href="/" className="flex items-center gap-2">
-          <span
-            className="text-2xl font-medium tracking-tight"
-            style={{ fontFamily: "var(--font-dm-sans)", color: "var(--foreground)" }}
-          >
-            <span style={{ color: "#8b5cf6" }}>Zae</span>lyn
-          </span>
-        </Link>
+        <ZaelynLogo href="/" size={24} />
 
         <div className="flex flex-col gap-3">
           <h1

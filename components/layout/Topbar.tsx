@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Sun, Moon, CaretDown, Ghost, ShieldCheck } from "@phosphor-icons/react";
+import ZaelynLogo from "@/components/ui/ZaelynLogo";
 import { useAuthStore } from "@/store/useAuthStore";
 import { usePhantomStore } from "@/store/usePhantomStore";
 import { useLanguageStore } from "@/store/useLanguageStore";
@@ -55,13 +56,7 @@ export default function Topbar() {
       }}
     >
       {/* Logo */}
-      <Link
-        href="/chat"
-        className="text-[17px] font-medium tracking-tight flex-shrink-0"
-        style={{ fontFamily: "var(--font-dm-sans)", color: "var(--foreground)" }}
-      >
-        <span style={{ color: "#8b5cf6" }}>Zae</span>lyn
-      </Link>
+      <ZaelynLogo href="/chat" size={17} />
 
       <div className="flex-1" />
 
