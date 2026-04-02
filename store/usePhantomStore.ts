@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { useChatStore } from "./useChatStore";
 
 type SubMode = "pure" | "selective" | "encrypted";
 
@@ -16,8 +17,12 @@ export const usePhantomStore = create<PhantomStore>((set) => ({
   anonToken: null,
   subMode: null,
   expiresAt: null,
-  activate: (token, subMode, expiresAt) =>
-    set({ isPhantom: true, anonToken: token, subMode, expiresAt }),
-  deactivate: () =>
-    set({ isPhantom: false, anonToken: null, subMode: null, expiresAt: null }),
+  activate: (token, subMode, expiresAt) => {
+    useChatStore.getState().setPrivacyMode("phantom"); // wipes history
+    set({ isPhantom: true, anonToken: token, subMode, expiresAt });
+  },
+  deactivate: () => {
+    useChatStore.getState().setPrivacyMode("sovereign"); // wipes phantom history
+    set({ isPhantom: false, anonToken: null, subMode: null, expiresAt: null });
+  },
 }));

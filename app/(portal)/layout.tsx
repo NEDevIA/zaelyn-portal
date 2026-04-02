@@ -6,17 +6,20 @@ import Topbar from "@/components/layout/Topbar";
 import Sidebar from "@/components/layout/Sidebar";
 import RightPanel from "@/components/layout/RightPanel";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useChatStore } from "@/store/useChatStore";
 import { getMe } from "@/lib/api";
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { setUser, clearUser, setHydrated } = useAuthStore();
+  const setPrivacyMode = useChatStore((s) => s.setPrivacyMode);
 
   useEffect(() => {
     getMe()
       .then((user) => {
         if (user?.id) {
           setUser(user);
+          if (user.privacyMode) setPrivacyMode(user.privacyMode);
         } else {
           clearUser();
           router.replace("/login");

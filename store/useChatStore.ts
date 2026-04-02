@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 function uuid(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -24,10 +24,13 @@ export interface ChatMessage {
   isStreaming?: boolean;
 }
 
+type PrivacyMode = "comfort" | "sovereign" | "phantom" | "full_sovereign";
+
 interface ChatStore {
   messages: ChatMessage[];
   conversationId: string | null;
   isStreaming: boolean;
+  privacyMode: PrivacyMode;
   addUserMessage: (content: string) => string;
   startAIMessage: () => string;
   appendChunk: (id: string, chunk: string) => void;
@@ -35,14 +38,31 @@ interface ChatStore {
   addChip: (id: string, chip: ModuleChipData) => void;
   newConversation: () => void;
   setConversationId: (id: string) => void;
+  setPrivacyMode: (mode: PrivacyMode) => void;
+  clearHistory: () => void;
 }
+
+// Storage that switches between localStorage (comfort) and sessionStorage (sovereign).
+// Phantom mode never writes — handled via partialize returning {}.
+const adaptiveStorage = createJSONStorage(() => {
+  if (typeof window === "undefined") return localStorage;
+  // Read current mode from the store key to decide storage type.
+  // Default to sessionStorage (safer) if mode is unknown.
+  try {
+    const raw = localStorage.getItem("zaelyn-chat");
+    const parsed = raw ? (JSON.parse(raw) as { state?: { privacyMode?: string } }) : null;
+    if (parsed?.state?.privacyMode === "comfort") return localStorage;
+  } catch { /* ignore */ }
+  return sessionStorage;
+});
 
 export const useChatStore = create<ChatStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       messages: [],
       conversationId: null,
       isStreaming: false,
+      privacyMode: "sovereign",
 
       addUserMessage: (content) => {
         const id = uuid();
@@ -89,10 +109,34 @@ export const useChatStore = create<ChatStore>()(
       },
 
       setConversationId: (id) => set({ conversationId: id }),
+
+      setPrivacyMode: (mode) => {
+        const prev = get().privacyMode;
+        set({ privacyMode: mode });
+
+        // Entering or leaving phantom → wipe history immediately
+        if (mode === "phantom" || prev === "phantom") {
+          set({ messages: [], conversationId: uuid(), isStreaming: false });
+          // Remove any persisted data from both storages
+          try { localStorage.removeItem("zaelyn-chat"); } catch { /* ignore */ }
+          try { sessionStorage.removeItem("zaelyn-chat"); } catch { /* ignore */ }
+        }
+      },
+
+      clearHistory: () => {
+        set({ messages: [], conversationId: uuid(), isStreaming: false });
+        try { localStorage.removeItem("zaelyn-chat"); } catch { /* ignore */ }
+        try { sessionStorage.removeItem("zaelyn-chat"); } catch { /* ignore */ }
+      },
     }),
     {
       name: "zaelyn-chat",
-      partialize: (s) => ({ messages: s.messages, conversationId: s.conversationId }),
+      storage: adaptiveStorage,
+      // Phantom: persist nothing. All other modes: persist messages + conversationId.
+      partialize: (s) =>
+        s.privacyMode === "phantom"
+          ? ({ privacyMode: s.privacyMode } as Partial<ChatStore>)
+          : { messages: s.messages, conversationId: s.conversationId, privacyMode: s.privacyMode },
     }
   )
 );
