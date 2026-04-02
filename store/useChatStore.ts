@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 function uuid(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -36,54 +37,62 @@ interface ChatStore {
   setConversationId: (id: string) => void;
 }
 
-export const useChatStore = create<ChatStore>((set, get) => ({
-  messages: [],
-  conversationId: null,
-  isStreaming: false,
-
-  addUserMessage: (content) => {
-    const id = uuid();
-    set((s) => ({ messages: [...s.messages, { id, role: "user", content }] }));
-    return id;
-  },
-
-  startAIMessage: () => {
-    const id = uuid();
-    set((s) => ({
-      messages: [...s.messages, { id, role: "ai", content: "", isStreaming: true }],
-      isStreaming: true,
-    }));
-    return id;
-  },
-
-  appendChunk: (id, chunk) => {
-    set((s) => ({
-      messages: s.messages.map((m) =>
-        m.id === id ? { ...m, content: m.content + chunk } : m
-      ),
-    }));
-  },
-
-  finishAIMessage: (id) => {
-    set((s) => ({
-      messages: s.messages.map((m) =>
-        m.id === id ? { ...m, isStreaming: false } : m
-      ),
+export const useChatStore = create<ChatStore>()(
+  persist(
+    (set) => ({
+      messages: [],
+      conversationId: null,
       isStreaming: false,
-    }));
-  },
 
-  addChip: (id, chip) => {
-    set((s) => ({
-      messages: s.messages.map((m) =>
-        m.id === id ? { ...m, chips: [...(m.chips ?? []), chip] } : m
-      ),
-    }));
-  },
+      addUserMessage: (content) => {
+        const id = uuid();
+        set((s) => ({ messages: [...s.messages, { id, role: "user", content }] }));
+        return id;
+      },
 
-  newConversation: () => {
-    set({ messages: [], conversationId: uuid(), isStreaming: false });
-  },
+      startAIMessage: () => {
+        const id = uuid();
+        set((s) => ({
+          messages: [...s.messages, { id, role: "ai", content: "", isStreaming: true }],
+          isStreaming: true,
+        }));
+        return id;
+      },
 
-  setConversationId: (id) => set({ conversationId: id }),
-}));
+      appendChunk: (id, chunk) => {
+        set((s) => ({
+          messages: s.messages.map((m) =>
+            m.id === id ? { ...m, content: m.content + chunk } : m
+          ),
+        }));
+      },
+
+      finishAIMessage: (id) => {
+        set((s) => ({
+          messages: s.messages.map((m) =>
+            m.id === id ? { ...m, isStreaming: false } : m
+          ),
+          isStreaming: false,
+        }));
+      },
+
+      addChip: (id, chip) => {
+        set((s) => ({
+          messages: s.messages.map((m) =>
+            m.id === id ? { ...m, chips: [...(m.chips ?? []), chip] } : m
+          ),
+        }));
+      },
+
+      newConversation: () => {
+        set({ messages: [], conversationId: uuid(), isStreaming: false });
+      },
+
+      setConversationId: (id) => set({ conversationId: id }),
+    }),
+    {
+      name: "zaelyn-chat",
+      partialize: (s) => ({ messages: s.messages, conversationId: s.conversationId }),
+    }
+  )
+);
