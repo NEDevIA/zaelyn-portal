@@ -23,7 +23,7 @@ export async function logout() {
 }
 
 export async function getWsToken(): Promise<string | null> {
-  const res = await fetch("/api/auth/session");
+  const res = await fetch("/api/auth/ws-token");
   if (!res.ok) return null;
   const data = await res.json();
   return data.token ?? null;

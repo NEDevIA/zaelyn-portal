@@ -24,7 +24,7 @@ export default function Composer({ onSend, isStreaming, onStop, isPhantom, disab
   }, [value]);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       submit();
     }
@@ -107,7 +107,7 @@ export default function Composer({ onSend, isStreaming, onStop, isPhantom, disab
       >
         {isPhantom
           ? "Phantom activo ◈ — esta sesión no existe en ningún servidor"
-          : "Sovereign — sin logs · Cmd+Enter para enviar"}
+          : "Sovereign — sin logs · Enter para enviar · Shift+Enter para nueva línea"}
       </p>
     </div>
   );
