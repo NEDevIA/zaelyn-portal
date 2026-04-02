@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? "https://ne-botios-staging.fly.dev";
+const API = process.env.NEXT_PUBLIC_API_URL ?? "https://botios-staging.fly.dev";
 
 export async function POST(req: NextRequest) {
   const token = req.cookies.get("zaelyn-token")?.value;

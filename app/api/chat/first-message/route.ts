@@ -10,7 +10,7 @@ export async function GET() {
 
   try {
     const res = await fetch(
-      `${process.env.BACKEND_URL ?? "https://ne-botios-staging.fly.dev"}/api/v1/portal/first-message-today`,
+      `${process.env.BACKEND_URL ?? "https://botios-staging.fly.dev"}/api/v1/portal/first-message-today`,
       {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",

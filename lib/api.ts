@@ -1,4 +1,4 @@
-const API = process.env.NEXT_PUBLIC_API_URL ?? "https://ne-botios-staging.fly.dev";
+const API = process.env.NEXT_PUBLIC_API_URL ?? "https://botios-staging.fly.dev";
 
 // All calls go through Next.js API routes (which read the httpOnly cookie).
 // Direct backend calls are made server-side only.

@@ -1,4 +1,4 @@
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "wss://ne-botios-staging.fly.dev";
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "wss://botios-staging.fly.dev";
 
 export type WSServerMessage =
   | { type: "text_chunk"; content: string }

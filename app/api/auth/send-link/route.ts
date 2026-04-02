@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     // Optionally notify backend of invite usage (fire-and-forget, non-blocking)
     if (inviteCode) {
       const API =
-        process.env.NEXT_PUBLIC_API_URL ?? "https://ne-botios-staging.fly.dev";
+        process.env.NEXT_PUBLIC_API_URL ?? "https://botios-staging.fly.dev";
       fetch(`${API}/api/v1/invites/${encodeURIComponent(inviteCode)}/use`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
