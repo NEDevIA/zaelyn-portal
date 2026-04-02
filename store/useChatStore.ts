@@ -40,6 +40,7 @@ interface ChatStore {
   setConversationId: (id: string) => void;
   setPrivacyMode: (mode: PrivacyMode) => void;
   clearHistory: () => void;
+  replaceLastAIMessage: (text: string) => void;
 }
 
 // Storage that switches between localStorage (comfort) and sessionStorage (sovereign).
@@ -109,6 +110,18 @@ export const useChatStore = create<ChatStore>()(
       },
 
       setConversationId: (id) => set({ conversationId: id }),
+
+      replaceLastAIMessage: (text) => {
+        set((s) => {
+          const idx = [...s.messages].reverse().findIndex((m) => m.role === "ai");
+          if (idx === -1) return s;
+          const realIdx = s.messages.length - 1 - idx;
+          const updated = s.messages.map((m, i) =>
+            i === realIdx ? { ...m, content: text, isStreaming: false } : m
+          );
+          return { messages: updated };
+        });
+      },
 
       setPrivacyMode: (mode) => {
         const prev = get().privacyMode;

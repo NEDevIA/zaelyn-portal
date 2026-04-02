@@ -38,6 +38,7 @@ export default function ChatPage() {
     appendChunk,
     finishAIMessage,
     addChip,
+    replaceLastAIMessage,
     isStreaming,
     conversationId,
     newConversation,
@@ -107,6 +108,10 @@ export default function ChatPage() {
         });
         break;
       }
+
+      case "replace_text":
+        replaceLastAIMessage(msg.text);
+        break;
 
       case "phantom_expired":
         // Handled by the phantom store / banner

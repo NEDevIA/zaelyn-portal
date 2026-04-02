@@ -10,6 +10,7 @@ export type WSServerMessage =
   | { type: "module_saved"; module: string; itemType: string; summary: string; id: string }
   | { type: "phantom_expired" }
   | { type: "entity_detected"; entities: unknown[] }
+  | { type: "replace_text"; text: string }
   | { type: "error"; code: string; message: string }
   | { type: "ping" };
 
