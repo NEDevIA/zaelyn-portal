@@ -3,6 +3,10 @@ const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "wss://botios-staging.fly.dev";
 export type WSServerMessage =
   | { type: "text_chunk"; content: string }
   | { type: "text_done" }
+  | { type: "token"; text: string }
+  | { type: "done"; metadata?: Record<string, unknown> }
+  | { type: "typing" }
+  | { type: "auth_ok"; userId: string }
   | { type: "module_saved"; module: string; itemType: string; summary: string; id: string }
   | { type: "phantom_expired" }
   | { type: "entity_detected"; entities: unknown[] }
@@ -42,7 +46,7 @@ export class ZaelynWS {
   private connect() {
     if (this.destroyed) return;
     try {
-      this.ws = new WebSocket(`${WS_URL}?token=${encodeURIComponent(this.token)}`);
+      this.ws = new WebSocket(`${WS_URL}/api/v1/portal/stream?token=${encodeURIComponent(this.token)}`);
 
       this.ws.onopen = () => {
         this.reconnectDelay = 2000;
@@ -51,12 +55,22 @@ export class ZaelynWS {
 
       this.ws.onmessage = (e) => {
         try {
-          const msg = JSON.parse(e.data) as WSServerMessage;
-          if (msg.type === "ping") {
-            this.send({ type: "pong" });
+          const raw = JSON.parse(e.data) as WSServerMessage;
+
+          if (raw.type === "ping") { this.send({ type: "pong" }); return; }
+          if (raw.type === "typing" || raw.type === "auth_ok") return;
+
+          // Normalize backend types → portal types
+          if (raw.type === "token") {
+            this.onMessage({ type: "text_chunk", content: (raw as { type: "token"; text: string }).text });
             return;
           }
-          this.onMessage(msg);
+          if (raw.type === "done") {
+            this.onMessage({ type: "text_done" });
+            return;
+          }
+
+          this.onMessage(raw);
         } catch { /* ignore malformed messages */ }
       };
 
