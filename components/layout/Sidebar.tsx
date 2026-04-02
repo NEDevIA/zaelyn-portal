@@ -8,7 +8,7 @@ import { useChatStore } from "@/store/useChatStore";
 import { useRightPanelStore } from "@/store/useRightPanelStore";
 
 const MODULES = [
-  { id: "mira",    label: "Tu diario",   color: "#8b5cf6", path: "/mira" },
+  { id: "aura",    label: "Tu aura",     color: "#8b5cf6", path: "/aura" },
   { id: "sirius",  label: "Tu memoria",  color: "#7c3aed", path: "/sirius" },
   { id: "orion",   label: "Tus tareas",  color: "#3b82f6", path: "/orion" },
   { id: "polaris", label: "Tus metas",   color: "#10b981", path: "/polaris" },
