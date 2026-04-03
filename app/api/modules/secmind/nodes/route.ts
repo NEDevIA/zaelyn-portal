@@ -26,9 +26,11 @@ export async function GET(req: NextRequest) {
 
     return proxyResponse(res);
   } catch (err) {
+    const cause = err instanceof Error && (err as NodeJS.ErrnoException).cause;
     const msg = err instanceof Error ? err.message : String(err);
-    console.error("[secmind/nodes GET]", msg);
-    return Response.json({ error: msg }, { status: 500 });
+    const detail = cause instanceof Error ? cause.message : String(cause ?? "");
+    console.error("[secmind/nodes GET]", msg, detail);
+    return Response.json({ error: msg, detail, url: SECMIND_URL }, { status: 500 });
   }
 }
 
