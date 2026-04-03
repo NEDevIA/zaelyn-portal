@@ -3,9 +3,24 @@
  * POST /api/modules/secmind/nodes  → POST botios-mod-secmind/nodes
  *
  * GET query params: limit, offset, daily, para_bucket, evergreen
+ *
+ * Includes one automatic retry (2 s delay) to handle Fly.io cold-start
+ * connection timeouts.
  */
 import { NextRequest } from "next/server";
 import { getModuleJwt, unauthorized, proxyResponse, SECMIND_URL } from "@/lib/module-auth";
+
+async function fetchWithRetry(url: string, init: RequestInit, retries = 1): Promise<Response> {
+  try {
+    return await fetch(url, init);
+  } catch (err) {
+    if (retries > 0) {
+      await new Promise((r) => setTimeout(r, 2000));
+      return fetchWithRetry(url, init, retries - 1);
+    }
+    throw err;
+  }
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -19,7 +34,7 @@ export async function GET(req: NextRequest) {
       if (v) upstream.searchParams.set(k, v);
     });
 
-    const res = await fetch(upstream.toString(), {
+    const res = await fetchWithRetry(upstream.toString(), {
       headers: { Authorization: `Bearer ${jwt}` },
       cache: "no-store",
     });
@@ -27,10 +42,8 @@ export async function GET(req: NextRequest) {
     return proxyResponse(res);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    const cause = (err instanceof Error && (err as Error & { cause?: unknown }).cause);
-    const causeMsg = cause instanceof Error ? cause.message : String(cause ?? "");
-    console.error("[secmind/nodes GET]", msg, causeMsg);
-    return Response.json({ error: msg, cause: causeMsg, url: SECMIND_URL }, { status: 500 });
+    console.error("[secmind/nodes GET]", msg);
+    return Response.json({ error: "Módulo Sirius no disponible temporalmente" }, { status: 503 });
   }
 }
 

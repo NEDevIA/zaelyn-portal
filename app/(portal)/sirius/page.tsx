@@ -386,9 +386,10 @@ export default function SiriusPage() {
 
         {/* Error */}
         {!loading && error && (
-          <div style={{ padding: "10px 24px", fontSize: 12, color: "#ef4444", background: "rgba(239,68,68,0.05)", borderBottom: "1px solid rgba(239,68,68,0.2)" }}>
-            {error}{" "}
-            <button onClick={load} style={{ textDecoration: "underline", cursor: "pointer", background: "none", border: "none", color: "inherit", fontFamily: "inherit", fontSize: "inherit" }}>Reintentar</button>
+          <div style={{ padding: "10px 24px", fontSize: 12, color: "#94A3B8", background: "rgba(148,163,184,0.06)", borderBottom: "1px solid rgba(148,163,184,0.12)", display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 14 }}>⚠️</span>
+            <span>Sirius está despertando — puede tardar unos segundos la primera vez.</span>
+            <button onClick={load} style={{ marginLeft: 4, textDecoration: "underline", cursor: "pointer", background: "none", border: "none", color: "inherit", fontFamily: "inherit", fontSize: "inherit", whiteSpace: "nowrap" }}>Reintentar</button>
           </div>
         )}
 
