@@ -160,7 +160,7 @@ class StarMapEngine {
       y:  cy + (Math.random() - 0.5) * spread * 0.65,
       vx: (Math.random() - 0.5) * 1.5,
       vy: (Math.random() - 0.5) * 1.5,
-      r:  7 + (n.connections || 0) * 2.8,
+      r:  7,
       ph: Math.random() * Math.PI * 2,
       z:  (Math.random() - 0.5) * 0.6,
     }));
@@ -544,21 +544,7 @@ class StarMapEngine {
         cx.fillText(lbl, x, y + r + 5);
       }
 
-      // 10 — Zettel ID (hover/select only)
-      if ((isH || isS) && n.zettel_id) {
-        cx.font = "10px JetBrains Mono, monospace";
-        cx.textAlign = "center"; cx.textBaseline = "top";
-        cx.fillStyle = this.lightMode ? "rgba(99,102,241,.6)" : "rgba(129,140,248,.5)";
-        cx.fillText(n.zettel_id, x, y + r + 18);
-      }
-
-      // 11 — Evergreen dot (top-right of node)
-      if (!isDim && n.evergreen) {
-        const evColor = n.evergreen === "mature" ? "#F0C060" : n.evergreen === "growing" ? "#818CF8" : "#34D399";
-        cx.beginPath(); cx.arc(x + r * 0.7, y - r * 0.7, 3, 0, Math.PI * 2);
-        cx.fillStyle = evColor + "CC";
-        cx.fill();
-      }
+      // (fields zettel_id / evergreen removed — not in real API schema)
     }
   }
 }

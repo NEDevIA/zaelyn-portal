@@ -5,30 +5,52 @@ export type Evergreen  = "seedling" | "growing" | "mature";
 export type NodeType   = "idea" | "note" | "person" | "resource" | "project" | "insight";
 export type TabKey     = "constellation" | "para" | "buscar";
 
+/**
+ * Real API response from GET /nodes (listNodes SELECT)
+ * Fields: id, title, summary, node_type, para_bucket, tags, source,
+ *         created_at, updated_at, last_reviewed
+ *
+ * Fields NOT in API (were mock-only): zettel_id, evergreen, connections,
+ *         has_embedding, backlinks_count
+ */
 export interface SiriusNode {
-  id:              string;
-  zettel_id:       string;
-  title:           string;
-  node_type:       NodeType;
-  para_bucket:     ParaBucket;
-  evergreen:       Evergreen;
-  backlinks_count: number;
-  connections:     number;
-  tags:            string[];
-  summary:         string;
-  content?:        string;
-  reflection?:     string | null;
-  has_embedding:   boolean;
+  id:            string;
+  title:         string;
+  summary:       string | null;
+  node_type:     NodeType;
+  para_bucket:   ParaBucket;
+  tags:          string[];
+  source:        string | null;
+  created_at:    string;
+  updated_at:    string;
+  last_reviewed: string | null;
+  // Present only on GET /nodes/:id (select *)
+  content?:      string | null;
+  reflection?:   string | null;
 }
 
+/** Raw link record returned by getNodeLinks / getNode */
+export interface RawLink {
+  id:           string;
+  from_node_id: string;
+  to_node_id:   string;
+  link_type:    string;
+  strength:     number;
+  auto_created: boolean;
+  confirmed_at: string | null;
+  from_node:    { id: string; title: string; node_type: string; summary: string | null } | null;
+  to_node:      { id: string; title: string; node_type: string; summary: string | null } | null;
+}
+
+/** Node returned by GET /nodes/:id — includes links array */
+export interface DetailNode extends SiriusNode {
+  links: RawLink[];
+}
+
+/** Derived from links for the constellation canvas */
 export interface SiriusLink {
   source: string;
   target: string;
-}
-
-export interface DetailNode extends SiriusNode {
-  connected:  SiriusNode[];
-  backlinks:  SiriusNode[];
 }
 
 // ── Colours ───────────────────────────────────────────────────────────────
@@ -81,50 +103,26 @@ export const NODE_META: Record<NodeType, { bg: string; color: string; label: str
   insight:  { bg: "rgba(52,211,153,.12)",  color: "#34D399", label: "Insight"  },
 };
 
-export const EV_ICONS: Record<Evergreen, string> = {
-  seedling: "🌱",
-  growing:  "🌿",
-  mature:   "🌳",
-};
+// ── Helpers ───────────────────────────────────────────────────────────────
 
-export const EV_LABELS: Record<Evergreen, string> = {
-  seedling: "Semilla",
-  growing:  "Creciendo",
-  mature:   "Madura",
-};
+/** Derive SiriusLinks for the constellation from a node's links array */
+export function deriveLinks(nodes: SiriusNode[], allLinks: RawLink[]): SiriusLink[] {
+  const nodeIds = new Set(nodes.map((n) => n.id));
+  const seen    = new Set<string>();
+  const result: SiriusLink[] = [];
 
-// ── Mock data (fallback / dev) ─────────────────────────────────────────────
+  for (const l of allLinks) {
+    if (!nodeIds.has(l.from_node_id) || !nodeIds.has(l.to_node_id)) continue;
+    const key = [l.from_node_id, l.to_node_id].sort().join("|");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push({ source: l.from_node_id, target: l.to_node_id });
+  }
+  return result;
+}
 
-export const MOCK_NODES: SiriusNode[] = [
-  { id: "1", zettel_id: "Z001", title: "Zaelyn.AI", node_type: "project", para_bucket: "projects",
-    evergreen: "mature", backlinks_count: 4, connections: 4, tags: ["saas","ai","telegram","beta"],
-    summary: "Primer producto de NE DevIA — AI bot multi-módulo con Telegram y portal web.",
-    content: "Bot de productividad IA desplegado en Fly.io con Supabase. Módulos: Aura (journal), Orion (tareas), Sirius (memoria), Polaris (metas).",
-    reflection: null, has_embedding: true },
-  { id: "2", zettel_id: "Z002", title: "Arquitectura BotIOS", node_type: "note", para_bucket: "projects",
-    evergreen: "growing", backlinks_count: 2, connections: 3, tags: ["backend","node.js","fly.io"],
-    summary: "Hub central del ecosistema. Patrón hub-and-spokes con AXON como registry de módulos.",
-    content: "17+ módulos nombrados con sistema de constelaciones. Stack: Node.js + Fly.io + Supabase + BullMQ + node-cron.",
-    reflection: null, has_embedding: true },
-  { id: "3", zettel_id: "Z003", title: "Modelo de Datos ZAE", node_type: "note", para_bucket: "resources",
-    evergreen: "growing", backlinks_count: 2, connections: 3, tags: ["supabase","postgres","schema"],
-    summary: "Un Supabase compartido con schemas separados por módulo. RLS por user_id.",
-    reflection: null, has_embedding: true },
-  { id: "4", zettel_id: "Z004", title: "SAP FI/CO Expertise", node_type: "resource", para_bucket: "resources",
-    evergreen: "mature", backlinks_count: 3, connections: 2, tags: ["sap","fi-co","erp"],
-    summary: "20+ años de consultoría SAP FI/CO. Base técnica que informa toda la arquitectura de Zaera.",
-    reflection: "Esta expertise es el foso competitivo real del ecosistema.", has_embedding: true },
-  { id: "5", zettel_id: "Z005", title: "Mercado Hispano", node_type: "idea", para_bucket: "areas",
-    evergreen: "mature", backlinks_count: 2, connections: 2, tags: ["mercado","estrategia","latam"],
-    summary: "Segmento objetivo primario. PYMEs hispanohablantes no atendidas por tools en inglés.",
-    reflection: null, has_embedding: true },
-];
-
-export const MOCK_LINKS: SiriusLink[] = [
-  { source: "1", target: "2" },
-  { source: "1", target: "3" },
-  { source: "2", target: "3" },
-  { source: "3", target: "4" },
-  { source: "4", target: "5" },
-  { source: "1", target: "5" },
-];
+/** Format ISO date to short display string */
+export function fmtDate(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString("es-MX", { day: "numeric", month: "short" });
+}
