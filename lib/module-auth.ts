@@ -21,6 +21,32 @@ export const REMIND_URL =
   process.env.MODULE_REMIND_URL ?? "https://botios-mod-remind.fly.dev";
 export const SECMIND_URL =
   process.env.MODULE_SECMIND_URL ?? "https://botios-mod-secmind.fly.dev";
+export const GOALS_URL =
+  process.env.MODULE_GOALS_URL ?? "https://botios-mod-goals.fly.dev";
+
+/** Extrae JWT + userId del portal auth (para módulos que usan x-user-id). */
+export async function getModuleAuth(
+  req: NextRequest
+): Promise<{ jwt: string; userId: string } | null> {
+  const sessionToken = req.cookies.get("zaelyn-token")?.value;
+  if (!sessionToken) return null;
+  const session = await verifySessionToken(sessionToken);
+  if (!session?.email) return null;
+  try {
+    const res = await fetch(`${BACKEND}/api/v1/portal/auth`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: session.email, channel: "web" }),
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { token?: string; userId?: string };
+    if (!data.token || !data.userId) return null;
+    return { jwt: data.token, userId: data.userId };
+  } catch {
+    return null;
+  }
+}
 
 /** Extrae un backend JWT a partir del cookie de sesión del portal. */
 export async function getModuleJwt(req: NextRequest): Promise<string | null> {
