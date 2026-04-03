@@ -107,7 +107,10 @@ export default function SiriusPage() {
     setError(null);
     try {
       const res = await fetch("/api/modules/secmind/nodes?limit=200", { cache: "no-store" });
-      if (!res.ok) throw new Error(`nodes: ${res.status}`);
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`nodes: ${res.status}${text ? ` — ${text.slice(0, 120)}` : ""}`);
+      }
       const data: NodesResponse = await res.json();
       const fetched = data.nodes ?? [];
       setNodes(fetched);

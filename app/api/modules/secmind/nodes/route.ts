@@ -8,22 +8,28 @@ import { NextRequest } from "next/server";
 import { getModuleJwt, unauthorized, proxyResponse, SECMIND_URL } from "@/lib/module-auth";
 
 export async function GET(req: NextRequest) {
-  const jwt = await getModuleJwt(req);
-  if (!jwt) return unauthorized();
+  try {
+    const jwt = await getModuleJwt(req);
+    if (!jwt) return unauthorized();
 
-  const upstream = new URL(`${SECMIND_URL}/nodes`);
-  const allowed = ["limit", "offset", "daily", "para_bucket", "evergreen", "include_links"];
-  allowed.forEach((k) => {
-    const v = req.nextUrl.searchParams.get(k);
-    if (v) upstream.searchParams.set(k, v);
-  });
+    const upstream = new URL(`${SECMIND_URL}/nodes`);
+    const allowed = ["limit", "offset", "daily", "para_bucket", "evergreen", "include_links"];
+    allowed.forEach((k) => {
+      const v = req.nextUrl.searchParams.get(k);
+      if (v) upstream.searchParams.set(k, v);
+    });
 
-  const res = await fetch(upstream.toString(), {
-    headers: { Authorization: `Bearer ${jwt}` },
-    cache: "no-store",
-  });
+    const res = await fetch(upstream.toString(), {
+      headers: { Authorization: `Bearer ${jwt}` },
+      cache: "no-store",
+    });
 
-  return proxyResponse(res);
+    return proxyResponse(res);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[secmind/nodes GET]", msg);
+    return Response.json({ error: msg }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
