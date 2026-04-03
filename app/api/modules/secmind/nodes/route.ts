@@ -27,8 +27,10 @@ export async function GET(req: NextRequest) {
     return proxyResponse(res);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error("[secmind/nodes GET]", msg);
-    return Response.json({ error: "Error al conectar con el módulo Sirius" }, { status: 500 });
+    const cause = (err instanceof Error && (err as Error & { cause?: unknown }).cause);
+    const causeMsg = cause instanceof Error ? cause.message : String(cause ?? "");
+    console.error("[secmind/nodes GET]", msg, causeMsg);
+    return Response.json({ error: msg, cause: causeMsg, url: SECMIND_URL }, { status: 500 });
   }
 }
 
