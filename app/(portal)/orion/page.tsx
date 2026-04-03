@@ -150,9 +150,10 @@ export default function OrionPage() {
   const [error,       setError]       = useState<string | null>(null);
 
   // UI state
-  const [activeTab,  setActiveTab]  = useState<TabKey>("tareas");
-  const [activeView, setActiveView] = useState<ViewKey>("today");
-  const [doneIds,    setDoneIds]    = useState<Set<number>>(new Set());
+  const [activeTab,   setActiveTab]   = useState<TabKey>("tareas");
+  const [activeView,  setActiveView]  = useState<ViewKey>("today");
+  const [doneIds,     setDoneIds]     = useState<Set<number>>(new Set());
+  const [checkinIds,  setCheckinIds]  = useState<Set<number>>(new Set());
 
   // ── Fetch ────────────────────────────────────────────────────────────
 
@@ -199,6 +200,37 @@ export default function OrionPage() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  // ── Habit check-in (optimistic) ─────────────────────────────────────
+
+  async function checkin(id: number) {
+    const strId = String(id);
+    // Optimistic: mark today as done immediately
+    setCheckinIds((prev) => new Set(prev).add(id));
+
+    try {
+      const res = await fetch(`/api/modules/remind/habits/${strId}/checkin`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        // Update streak in local habits state from API response
+        const data: { streakCurrent?: number } = await res.json().catch(() => ({}));
+        if (data.streakCurrent !== undefined) {
+          setHabits((prev) =>
+            prev.map((h) =>
+              h.id === id ? { ...h, streak: data.streakCurrent! } : h,
+            ),
+          );
+        }
+      } else {
+        // Rollback on failure
+        setCheckinIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
+      }
+    } catch {
+      // Rollback on network error
+      setCheckinIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
+    }
+  }
 
   // ── Toggle done (optimistic) ─────────────────────────────────────────
 
@@ -388,7 +420,13 @@ export default function OrionPage() {
           )}
 
           {/* ── HÁBITOS tab ── */}
-          {!loading && activeTab === "habitos" && <OrionHabitsMain />}
+          {!loading && activeTab === "habitos" && (
+            <OrionHabitsMain
+              habits={habits}
+              checkinIds={checkinIds}
+              onCheckin={checkin}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -19,6 +19,8 @@ export const JOURNAL_URL =
   process.env.MODULE_JOURNAL_URL ?? "https://botios-mod-journal.fly.dev";
 export const REMIND_URL =
   process.env.MODULE_REMIND_URL ?? "https://botios-mod-remind.fly.dev";
+export const SECMIND_URL =
+  process.env.MODULE_SECMIND_URL ?? "https://botios-mod-secmind.fly.dev";
 
 /** Extrae un backend JWT a partir del cookie de sesión del portal. */
 export async function getModuleJwt(req: NextRequest): Promise<string | null> {
