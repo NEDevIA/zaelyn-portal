@@ -170,3 +170,78 @@ body::after {
   pointer-events: none; opacity: 0.018;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+
+/* ─── Landing page CSS variables ──────────────────────────────────── */
+:root,
+[data-theme="light"] {
+  --z-violet: #9B7FE8;
+  --z-cyan:   #5EC4E8;
+  --z-magenta:#E879F9;
+  --z-navy:   #2D3494;
+  --aura:     #F472B6;
+  --orion:    #60A5FA;
+  --sirius:   #A78BFA;
+  --polaris:  #FCD34D;
+  --luna:     #C084FC;
+  --vega:     #34D399;
+  --ease-landing: cubic-bezier(0.16,1,0.3,1);
+  --font-display: var(--font-syne);
+  --font-mono-landing: var(--font-jetbrains);
+  /* Landing light theme */
+  --l-bg:   #faf9f7;
+  --l-bg2:  #f3f1ec;
+  --l-bg3:  #eae7e0;
+  --l-surface:  rgba(0,0,0,0.03);
+  --l-surface2: rgba(0,0,0,0.06);
+  --l-border:   rgba(0,0,0,0.08);
+  --l-border2:  rgba(0,0,0,0.15);
+  --l-text:  #18172a;
+  --l-text2: #6b697f;
+  --l-text3: #b0aec4;
+  --l-nav-bg: rgba(250,249,247,0.88);
+}
+[data-theme="dark"] {
+  --l-bg:   #05060f;
+  --l-bg2:  #090a18;
+  --l-bg3:  #0e1020;
+  --l-surface:  rgba(255,255,255,0.04);
+  --l-surface2: rgba(255,255,255,0.07);
+  --l-border:   rgba(255,255,255,0.06);
+  --l-border2:  rgba(255,255,255,0.13);
+  --l-text:  #f0eeff;
+  --l-text2: #7b7a9e;
+  --l-text3: #35344a;
+  --l-nav-bg: rgba(5,6,15,0.82);
+}
+
+/* ─── Scroll reveal ─────────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s var(--ease-landing), transform 0.7s var(--ease-landing);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Orb animations ────────────────────────────────────────────────── */
+@keyframes orbFloat {
+  0%   { opacity:0; transform:scale(1) translate(0,0); }
+  15%  { opacity:1; }
+  50%  { transform:scale(1.15) translate(30px,-20px); }
+  85%  { opacity:1; }
+  100% { opacity:0; transform:scale(1) translate(0,0); }
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes msgIn {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes cursorBlink {
+  0%,100% { opacity:1; }
+  50%     { opacity:0; }
+}
