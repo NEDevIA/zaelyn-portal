@@ -1,14 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Sun, Moon, CaretDown, Ghost, ShieldCheck } from "@phosphor-icons/react";
+import {
+  Sun,
+  Moon,
+  CaretDown,
+  Ghost,
+  ShieldCheck,
+  Eye,
+  Lock,
+  Lightning,
+  Brain,
+} from "@phosphor-icons/react";
 import ZaelynLogo from "@/components/ui/ZaelynLogo";
 import { useAuthStore } from "@/store/useAuthStore";
 import { usePhantomStore } from "@/store/usePhantomStore";
 import { useLanguageStore } from "@/store/useLanguageStore";
-import { logout } from "@/lib/api";
+import { logout, updateUser } from "@/lib/api";
 import type { Lang } from "@/lib/i18n";
 
 function getTheme() {
@@ -16,15 +26,79 @@ function getTheme() {
   return localStorage.getItem("zaelyn-theme") === "light" ? "light" : "dark";
 }
 
+type PrivacyLevel = "comfort" | "sovereign" | "full_sovereign";
+
+const PRIVACY_OPTIONS: {
+  value: PrivacyLevel;
+  label: string;
+  icon: React.ReactNode;
+  color: string;
+  bg: string;
+  border: string;
+  disabled?: boolean;
+  disabledLabel?: string;
+}[] = [
+  {
+    value: "comfort",
+    label: "Comfort",
+    icon: <Eye size={12} weight="fill" />,
+    color: "#3b82f6",
+    bg: "rgba(59,130,246,0.08)",
+    border: "rgba(59,130,246,0.2)",
+  },
+  {
+    value: "sovereign",
+    label: "Sovereign",
+    icon: <ShieldCheck size={12} weight="fill" />,
+    color: "#10b981",
+    bg: "rgba(16,185,129,0.06)",
+    border: "rgba(16,185,129,0.15)",
+  },
+  {
+    value: "full_sovereign",
+    label: "Full Sovereign",
+    icon: <Lock size={12} weight="fill" />,
+    color: "#6366f1",
+    bg: "rgba(99,102,241,0.06)",
+    border: "rgba(99,102,241,0.15)",
+    disabled: true,
+    disabledLabel: "Fase II",
+  },
+];
+
+function getPrivacyOption(mode: string | undefined) {
+  return PRIVACY_OPTIONS.find((o) => o.value === mode) ?? PRIVACY_OPTIONS[1];
+}
+
 export default function Topbar() {
   const router = useRouter();
-  const { user, clearUser } = useAuthStore();
-  const { isPhantom, deactivate } = usePhantomStore();
+  const { user, setUser, clearUser } = useAuthStore();
+  const { isPhantom } = usePhantomStore();
   const { lang, setLang } = useLanguageStore();
+
   const [theme, setTheme] = useState<"dark" | "light">(() =>
     typeof window !== "undefined" ? (getTheme() as "dark" | "light") : "dark"
   );
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showAvatarDropdown, setShowAvatarDropdown] = useState(false);
+  const [showModelDropdown, setShowModelDropdown] = useState(false);
+  const [showPrivacyDropdown, setShowPrivacyDropdown] = useState(false);
+
+  const avatarRef = useRef<HTMLDivElement>(null);
+  const modelRef = useRef<HTMLDivElement>(null);
+  const privacyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (avatarRef.current && !avatarRef.current.contains(e.target as Node))
+        setShowAvatarDropdown(false);
+      if (modelRef.current && !modelRef.current.contains(e.target as Node))
+        setShowModelDropdown(false);
+      if (privacyRef.current && !privacyRef.current.contains(e.target as Node))
+        setShowPrivacyDropdown(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   function toggleTheme() {
     const next = theme === "dark" ? "light" : "dark";
@@ -39,9 +113,39 @@ export default function Topbar() {
     router.push("/login");
   }
 
+  async function handleModelSelect(model: "fast" | "smart") {
+    setShowModelDropdown(false);
+    if (!user) return;
+    setUser({ ...user, preferredModel: model });
+    await updateUser({ preferred_model: model });
+  }
+
+  async function handlePrivacySelect(level: PrivacyLevel) {
+    setShowPrivacyDropdown(false);
+    if (!user) return;
+    setUser({ ...user, privacyMode: level });
+    await updateUser({ privacy_level: level });
+  }
+
   const initials = user?.name
-    ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
+    ? user.name
+        .split(" ")
+        .map((w) => w[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
     : user?.email?.slice(0, 2).toUpperCase() ?? "Z";
+
+  const isPro = user?.plan === "pro" || user?.plan === "enterprise";
+  const currentModel = user?.preferredModel ?? "fast";
+  const modelLabel = currentModel === "smart" ? "Zaelyn Smart" : "Zaelyn Fast";
+  const modelColor = currentModel === "smart" ? "#818cf8" : "#10b981";
+  const modelBg =
+    currentModel === "smart" ? "rgba(99,102,241,0.08)" : "rgba(16,185,129,0.08)";
+  const modelBorder =
+    currentModel === "smart" ? "rgba(99,102,241,0.2)" : "rgba(16,185,129,0.2)";
+
+  const privacyOpt = getPrivacyOption(user?.privacyMode);
 
   return (
     <header
@@ -61,18 +165,73 @@ export default function Topbar() {
       <div className="flex-1" />
 
       {/* Model selector */}
-      <button
-        className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors duration-150"
-        style={{
-          background: "rgba(16,185,129,0.08)",
-          border: "1px solid rgba(16,185,129,0.2)",
-          color: "#10b981",
-        }}
-      >
-        <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#10b981" }} />
-        Zaelyn Fast
-        <CaretDown size={10} weight="bold" />
-      </button>
+      <div ref={modelRef} className="relative hidden sm:block">
+        <button
+          onClick={() => isPro && setShowModelDropdown((v) => !v)}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors duration-150"
+          style={{
+            background: modelBg,
+            border: `1px solid ${modelBorder}`,
+            color: modelColor,
+            cursor: isPro ? "pointer" : "default",
+          }}
+        >
+          <span className="w-1.5 h-1.5 rounded-full" style={{ background: modelColor }} />
+          {modelLabel}
+          {isPro && <CaretDown size={10} weight="bold" />}
+        </button>
+
+        {showModelDropdown && (
+          <div
+            className="absolute right-0 top-10 w-48 rounded-xl overflow-hidden z-50"
+            style={{
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+            }}
+          >
+            {(
+              [
+                {
+                  value: "fast" as const,
+                  label: "Zaelyn Fast",
+                  sub: "Haiku · rápido y eficiente",
+                  icon: <Lightning size={13} weight="fill" />,
+                  color: "#10b981",
+                },
+                {
+                  value: "smart" as const,
+                  label: "Zaelyn Smart",
+                  sub: "Sonnet · profundo e inteligente",
+                  icon: <Brain size={13} weight="fill" />,
+                  color: "#818cf8",
+                },
+              ] as const
+            ).map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => handleModelSelect(opt.value)}
+                className="w-full flex items-start gap-2.5 px-4 py-3 text-left transition-colors duration-150"
+                style={{
+                  background:
+                    currentModel === opt.value ? `${opt.color}10` : "transparent",
+                  borderBottom: "1px solid var(--border)",
+                }}
+              >
+                <span style={{ color: opt.color, marginTop: "1px" }}>{opt.icon}</span>
+                <div>
+                  <p className="text-[12px] font-medium" style={{ color: "var(--foreground)" }}>
+                    {opt.label}
+                  </p>
+                  <p className="text-[10px]" style={{ color: "var(--muted-foreground)" }}>
+                    {opt.sub}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Privacy badge */}
       {isPhantom ? (
@@ -90,18 +249,74 @@ export default function Topbar() {
           <span style={{ fontSize: "10px" }}>◈</span>
         </Link>
       ) : (
-        <Link
-          href="/me/privacidad"
-          className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors duration-150"
-          style={{
-            background: "rgba(16,185,129,0.06)",
-            border: "1px solid rgba(16,185,129,0.15)",
-            color: "#10b981",
-          }}
-        >
-          <ShieldCheck size={12} weight="fill" />
-          Sovereign
-        </Link>
+        <div ref={privacyRef} className="relative hidden sm:block">
+          <button
+            onClick={() => setShowPrivacyDropdown((v) => !v)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors duration-150"
+            style={{
+              background: privacyOpt.bg,
+              border: `1px solid ${privacyOpt.border}`,
+              color: privacyOpt.color,
+            }}
+          >
+            {privacyOpt.icon}
+            {privacyOpt.label}
+            <CaretDown size={10} weight="bold" />
+          </button>
+
+          {showPrivacyDropdown && (
+            <div
+              className="absolute right-0 top-10 w-52 rounded-xl overflow-hidden z-50"
+              style={{
+                background: "var(--card)",
+                border: "1px solid var(--border)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+              }}
+            >
+              {PRIVACY_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => !opt.disabled && handlePrivacySelect(opt.value)}
+                  className="w-full flex items-center gap-2.5 px-4 py-3 text-left transition-colors duration-150"
+                  style={{
+                    background:
+                      privacyOpt.value === opt.value ? `${opt.color}10` : "transparent",
+                    borderBottom: "1px solid var(--border)",
+                    opacity: opt.disabled ? 0.5 : 1,
+                    cursor: opt.disabled ? "default" : "pointer",
+                  }}
+                >
+                  <span style={{ color: opt.color }}>{opt.icon}</span>
+                  <span
+                    className="text-[12px] font-medium flex-1"
+                    style={{ color: "var(--foreground)" }}
+                  >
+                    {opt.label}
+                  </span>
+                  {opt.disabled && (
+                    <span
+                      className="text-[9px] font-medium px-1.5 py-0.5 rounded-full"
+                      style={{ background: `${opt.color}15`, color: opt.color }}
+                    >
+                      {opt.disabledLabel}
+                    </span>
+                  )}
+                  {privacyOpt.value === opt.value && !opt.disabled && (
+                    <span style={{ color: opt.color, fontSize: "10px" }}>✓</span>
+                  )}
+                </button>
+              ))}
+              <Link
+                href="/me/privacidad"
+                onClick={() => setShowPrivacyDropdown(false)}
+                className="flex items-center px-4 py-2.5 text-[11px] transition-colors duration-150"
+                style={{ color: "var(--muted-foreground)" }}
+              >
+                Gestionar Phantom Mode →
+              </Link>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Language pill */}
@@ -136,9 +351,9 @@ export default function Topbar() {
       </button>
 
       {/* Avatar / dropdown */}
-      <div className="relative">
+      <div ref={avatarRef} className="relative">
         <button
-          onClick={() => setShowDropdown((v) => !v)}
+          onClick={() => setShowAvatarDropdown((v) => !v)}
           className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-medium transition-all duration-150 flex-shrink-0"
           style={
             isPhantom
@@ -157,7 +372,7 @@ export default function Topbar() {
           {isPhantom ? <Ghost size={14} /> : initials}
         </button>
 
-        {showDropdown && (
+        {showAvatarDropdown && (
           <div
             className="absolute right-0 top-10 w-44 rounded-xl overflow-hidden z-50"
             style={{
@@ -167,18 +382,32 @@ export default function Topbar() {
             }}
           >
             <Link
-              href="/me"
-              onClick={() => setShowDropdown(false)}
+              href="/settings"
+              onClick={() => setShowAvatarDropdown(false)}
               className="block px-4 py-3 text-[13px] transition-colors duration-150"
               style={{ color: "var(--foreground)" }}
+            >
+              Configuración
+            </Link>
+            <Link
+              href="/me"
+              onClick={() => setShowAvatarDropdown(false)}
+              className="block px-4 py-3 text-[13px] transition-colors duration-150"
+              style={{
+                color: "var(--foreground)",
+                borderTop: "1px solid var(--border)",
+              }}
             >
               Mi perfil
             </Link>
             <Link
               href="/me/privacidad"
-              onClick={() => setShowDropdown(false)}
+              onClick={() => setShowAvatarDropdown(false)}
               className="block px-4 py-3 text-[13px] transition-colors duration-150"
-              style={{ color: "var(--foreground)", borderTop: "1px solid var(--border)" }}
+              style={{
+                color: "var(--foreground)",
+                borderTop: "1px solid var(--border)",
+              }}
             >
               Privacidad
             </Link>

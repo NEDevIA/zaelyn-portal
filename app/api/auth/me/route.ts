@@ -16,10 +16,11 @@ export async function GET(req: NextRequest) {
 
   const email = payload.email;
 
-  // Fetch real user profile from backend to get plan, display_name, privacy_mode
+  // Fetch real user profile from backend to get plan, display_name, metadata prefs
   let plan: string = "beta";
   let persona: string = "sabia";
   let privacyMode: string = "sovereign";
+  let preferredModel: string = "fast";
   let displayName: string = email.split("@")[0].replace(/[._]/g, " ");
 
   try {
@@ -31,21 +32,26 @@ export async function GET(req: NextRequest) {
       cache: "no-store",
     });
     if (res.ok) {
-      const { user } = await res.json() as { user: Record<string, string> };
-      if (user["plan"])         plan        = user["plan"];
-      if (user["display_name"]) displayName = user["display_name"];
-      if (user["privacy_mode"]) privacyMode = user["privacy_mode"];
+      const { user } = await res.json() as { user: Record<string, unknown> };
+      if (user["plan"])         plan        = user["plan"] as string;
+      if (user["display_name"]) displayName = user["display_name"] as string;
+      if (user["privacy_mode"]) privacyMode = user["privacy_mode"] as string;
+      // Preferences stored in metadata JSONB
+      const meta = user["metadata"] as Record<string, unknown> | undefined;
+      if (meta?.["privacy_level"]) privacyMode     = meta["privacy_level"] as string;
+      if (meta?.["preferred_model"]) preferredModel = meta["preferred_model"] as string;
     }
   } catch {
     // Backend unavailable — return safe defaults
   }
 
   return NextResponse.json({
-    id:          Buffer.from(email).toString("base64"),
+    id:             Buffer.from(email).toString("base64"),
     email,
-    name:        displayName,
+    name:           displayName,
     plan,
     persona,
     privacyMode,
+    preferredModel,
   });
 }

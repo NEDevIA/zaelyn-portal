@@ -36,32 +36,8 @@ export async function validateInviteCode(code: string) {
 }
 
 // Conversation history
-export interface ConversationSummary {
-  id: string;
-  first_message: string | null;
-  last_message: string | null;
-  message_count: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export async function getConversations(): Promise<ConversationSummary[]> {
-  const res = await fetch("/api/portal/conversations", { cache: "no-store" });
-  if (!res.ok) return [];
-  const data = await res.json() as { conversations?: ConversationSummary[] };
-  return data.conversations ?? [];
-}
-
-export async function getConversationMessages(
-  conversationId: string
-): Promise<{ id: string; role: string; content: string; created_at: string }[]> {
-  const res = await fetch(
-    `/api/portal/conversations/${encodeURIComponent(conversationId)}/messages`,
-    { cache: "no-store" }
-  );
-  if (!res.ok) return [];
-  const data = await res.json() as { messages?: { id: string; role: string; content: string; created_at: string }[] };
-  return data.messages ?? [];
+export async function getConversations() {
+  return [];
 }
 
 // Telegram linking
@@ -98,4 +74,43 @@ export async function endPhantom(anonToken: string): Promise<void> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ anonToken }),
   });
+}
+
+// Persona & user preferences
+export async function getPersona() {
+  const res = await fetch("/api/portal/persona", { cache: "no-store" });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function updatePersona(data: {
+  personaId?: string;
+  tone?: string;
+  language?: string;
+  briefingEnabled?: boolean;
+  briefingTime?: string;
+  preferredName?: string;
+  customInstructions?: string;
+}) {
+  const res = await fetch("/api/portal/persona", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function updateUser(data: {
+  preferred_model?: "fast" | "smart";
+  privacy_level?: "comfort" | "sovereign" | "phantom" | "full_sovereign";
+  display_name?: string;
+}) {
+  const res = await fetch("/api/portal/user", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) return null;
+  return res.json();
 }

@@ -7,6 +7,7 @@ export interface ZaelynUser {
   plan: "beta" | "free" | "pro" | "enterprise";
   persona?: string;
   privacyMode?: "comfort" | "sovereign" | "phantom" | "full_sovereign";
+  preferredModel?: "fast" | "smart";
   telegramId?: number | null;
   telegramUsername?: string | null;
 }
