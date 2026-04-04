@@ -9,7 +9,7 @@ interface TurnAIProps {
 
 export default function TurnAI({ message, isPhantom, onChipClick }: TurnAIProps) {
   return (
-    <div className="px-4 flex flex-col gap-2">
+    <div className="flex flex-col gap-2">
       {/* Zaelyn label */}
       <p
         className="text-[11px] font-medium tracking-wide"

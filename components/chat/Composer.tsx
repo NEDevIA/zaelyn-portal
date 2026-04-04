@@ -43,7 +43,7 @@ export default function Composer({ onSend, isStreaming, onStop, isPhantom, disab
 
   return (
     <div className="px-4 pb-5 pt-2">
-      <div style={{ maxWidth: "760px", margin: "0 auto", width: "100%" }}>
+      <div className="mx-auto" style={{ maxWidth: "760px", width: "100%" }}>
       <div
         className="flex items-end gap-3 px-4 py-3 rounded-2xl transition-all duration-200"
         style={{

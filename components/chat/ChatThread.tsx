@@ -37,17 +37,8 @@ export default function ChatThread({ isPhantom, onChipClick }: ChatThreadProps) 
   }
 
   return (
-    <div className="flex-1 overflow-y-auto py-6">
-      <div
-        style={{
-          maxWidth: "760px",
-          margin: "0 auto",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          gap: "24px",
-        }}
-      >
+    <div className="flex-1 overflow-y-auto">
+      <div className="py-6 flex flex-col gap-6 mx-auto" style={{ maxWidth: "760px", width: "100%" }}>
         {messages.map((msg) =>
           msg.role === "user" ? (
             <TurnUser key={msg.id} content={msg.content} />

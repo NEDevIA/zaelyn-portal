@@ -199,16 +199,16 @@ export default function ChatPage() {
       {/* Cambio 4: Banner Telegram — discreto, cierra con X, persiste en localStorage */}
       <TelegramBanner hasTelegram={!!user?.telegramId} />
 
-      {/* PASO 5: First-ever welcome (one time) */}
-      {firstMsgData?.isFirstEver && (
+      {/* PASO 5: First-ever welcome — only on a fresh session, not when viewing history */}
+      {firstMsgData?.isFirstEver && !urlConvId && (
         <WelcomeMessage
           userName={user?.name ?? user?.email}
           persona={firstMsgData.persona ?? user?.persona}
         />
       )}
 
-      {/* PASO 4: Daily greeting (first session of the day, not first ever) */}
-      {firstMsgData?.isFirstToday && !firstMsgData?.isFirstEver && (
+      {/* PASO 4: Daily greeting — only on a fresh session, not when viewing history */}
+      {firstMsgData?.isFirstToday && !firstMsgData?.isFirstEver && !urlConvId && (
         <DailyGreeting
           persona={firstMsgData.persona ?? user?.persona}
           hasUrgent={firstMsgData.hasUrgent}
