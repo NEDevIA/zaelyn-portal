@@ -68,6 +68,26 @@ export async function deleteConversation(id: string): Promise<void> {
   });
 }
 
+export interface ConversationMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  created_at: string;
+}
+
+export async function getConversationMessages(id: string): Promise<ConversationMessage[]> {
+  try {
+    const res = await fetch(`/api/portal/conversations/${encodeURIComponent(id)}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    const data = await res.json() as { messages?: ConversationMessage[] };
+    return data.messages ?? [];
+  } catch {
+    return [];
+  }
+}
+
 // Telegram linking
 export async function getTelegramLinkCode(): Promise<{ code: string; expiresIn: number } | null> {
   const res = await fetch("/api/portal/telegram/link-code", { cache: "no-store" });

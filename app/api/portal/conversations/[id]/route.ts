@@ -17,6 +17,24 @@ async function getHeaders() {
   };
 }
 
+// GET /api/portal/conversations/:id — fetch messages for a conversation
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const headers = await getHeaders();
+  if (!headers) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await params;
+
+  const res = await fetch(
+    `${API}/api/v1/portal/conversations/${encodeURIComponent(id)}/messages`,
+    { method: "GET", headers, cache: "no-store" }
+  );
+  const data = await res.json();
+  return NextResponse.json(data, { status: res.ok ? 200 : res.status });
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

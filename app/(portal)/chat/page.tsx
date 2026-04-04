@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import ChatThread from "@/components/chat/ChatThread";
 import Composer from "@/components/chat/Composer";
 import WelcomeMessage from "@/components/chat/WelcomeMessage";
@@ -32,6 +33,9 @@ interface FirstMessageData {
 }
 
 export default function ChatPage() {
+  const searchParams = useSearchParams();
+  const urlConvId = searchParams.get("id");
+
   const {
     addUserMessage,
     startAIMessage,
@@ -40,8 +44,10 @@ export default function ChatPage() {
     addChip,
     replaceLastAIMessage,
     isStreaming,
+    isLoadingHistory,
     conversationId,
     newConversation,
+    loadConversation,
   } = useChatStore();
   const { isPhantom, anonToken, subMode } = usePhantomStore();
   const { addCard } = useRightPanelStore();
@@ -53,10 +59,14 @@ export default function ChatPage() {
 
   const [firstMsgData, setFirstMsgData] = useState<FirstMessageData | null>(null);
 
-  // Ensure a conversation exists
+  // If URL has ?id=, load that conversation; otherwise ensure a fresh one exists
   useEffect(() => {
-    if (!conversationId) newConversation();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    if (urlConvId) {
+      loadConversation(urlConvId);
+    } else if (!conversationId) {
+      newConversation();
+    }
+  }, [urlConvId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // PASO 4: Check first-message-today on mount (only for authenticated users)
   useEffect(() => {
@@ -205,12 +215,22 @@ export default function ChatPage() {
         />
       )}
 
-      <ChatThread isPhantom={isPhantom} onChipClick={handleChipClick} />
+      {isLoadingHistory ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div
+            className="w-5 h-5 rounded-full border-2 animate-spin"
+            style={{ borderColor: "var(--border)", borderTopColor: "var(--foreground)" }}
+          />
+        </div>
+      ) : (
+        <ChatThread isPhantom={isPhantom} onChipClick={handleChipClick} />
+      )}
       <Composer
         onSend={handleSend}
         isStreaming={isStreaming}
         onStop={handleStop}
         isPhantom={isPhantom}
+        disabled={isLoadingHistory}
       />
     </div>
   );

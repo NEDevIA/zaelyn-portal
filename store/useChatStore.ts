@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { getConversationMessages } from "@/lib/api";
 
 function uuid(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -29,6 +30,7 @@ type PrivacyMode = "comfort" | "sovereign" | "phantom" | "full_sovereign";
 interface ChatStore {
   messages: ChatMessage[];
   conversationId: string | null;
+  isLoadingHistory: boolean;
   isStreaming: boolean;
   privacyMode: PrivacyMode;
   addUserMessage: (content: string) => string;
@@ -38,6 +40,7 @@ interface ChatStore {
   addChip: (id: string, chip: ModuleChipData) => void;
   newConversation: () => void;
   setConversationId: (id: string) => void;
+  loadConversation: (id: string) => Promise<void>;
   setPrivacyMode: (mode: PrivacyMode) => void;
   clearHistory: () => void;
   replaceLastAIMessage: (text: string) => void;
@@ -62,6 +65,7 @@ export const useChatStore = create<ChatStore>()(
     (set, get) => ({
       messages: [],
       conversationId: null,
+      isLoadingHistory: false,
       isStreaming: false,
       privacyMode: "sovereign",
 
@@ -110,6 +114,26 @@ export const useChatStore = create<ChatStore>()(
       },
 
       setConversationId: (id) => set({ conversationId: id }),
+
+      // Load a historical conversation by ID from the backend.
+      // Maps backend role "assistant" → "ai" to match local ChatMessage type.
+      loadConversation: async (id: string) => {
+        // Skip if already showing this conversation
+        if (get().conversationId === id && get().messages.length > 0) return;
+
+        set({ isLoadingHistory: true, messages: [], conversationId: id, isStreaming: false });
+        try {
+          const raw = await getConversationMessages(id);
+          const messages: ChatMessage[] = raw.map((m) => ({
+            id: m.id,
+            role: m.role === "assistant" ? "ai" : "user",
+            content: m.content,
+          }));
+          set({ messages, isLoadingHistory: false });
+        } catch {
+          set({ isLoadingHistory: false });
+        }
+      },
 
       replaceLastAIMessage: (text) => {
         set((s) => {
