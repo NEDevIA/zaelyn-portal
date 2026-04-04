@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import Topbar from "@/components/layout/Topbar";
 import Sidebar from "@/components/layout/Sidebar";
@@ -39,7 +39,10 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
     >
       <Topbar />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
+        {/* Sidebar uses useSearchParams — must be wrapped in Suspense */}
+        <Suspense fallback={<div style={{ width: "196px", borderRight: "1px solid var(--border)" }} />}>
+          <Sidebar />
+        </Suspense>
         <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
           {children}
         </main>

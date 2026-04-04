@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { DM_Sans, DM_Serif_Display, DM_Mono, Syne, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -40,7 +41,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           }
         `}} />
       </head>
-      <body>{children}</body>
+      {/* Suspense wraps all pages — required for useSearchParams() in child components */}
+      <body><Suspense>{children}</Suspense></body>
     </html>
   );
 }

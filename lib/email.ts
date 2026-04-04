@@ -1,6 +1,9 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy instantiation — avoids build-time crash when RESEND_API_KEY is not set
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY ?? "re_placeholder");
+}
 
 const FROM = process.env.EMAIL_FROM ?? "Zaelyn@national.expert";
 const APP_URL = process.env.NEXTAUTH_URL ?? "https://zaelyn.ai";
@@ -91,7 +94,7 @@ export async function sendMagicLinkEmail(
 </html>`;
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: `Zaelyn <${FROM}>`,
       to,
       subject: "Tu link de acceso a Zaelyn",
