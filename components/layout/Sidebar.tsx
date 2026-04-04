@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Plus, ChatsCircle, CaretDown } from "@phosphor-icons/react";
 import { useChatStore } from "@/store/useChatStore";
 import { useRightPanelStore } from "@/store/useRightPanelStore";
+import { getConversations, type ConversationSummary } from "@/lib/api";
 
 const MODULES = [
   { id: "aura",    label: "Tu aura",     color: "#8b5cf6", path: "/aura" },
@@ -17,14 +18,63 @@ const MODULES = [
 
 type ConvGroup = { label: string; conversations: { id: string; title: string; active?: boolean }[] };
 
+function groupConversations(
+  convs: ConversationSummary[],
+  activePath: string
+): ConvGroup[] {
+  if (convs.length === 0) return [];
+
+  const now = Date.now();
+  const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+  const yesterdayStart = new Date(todayStart); yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+  const weekStart = new Date(todayStart); weekStart.setDate(weekStart.getDate() - 7);
+
+  const groups: Record<string, ConversationSummary[]> = {
+    Hoy: [],
+    Ayer: [],
+    "Esta semana": [],
+    Anteriores: [],
+  };
+
+  for (const c of convs) {
+    const d = new Date(c.updated_at).getTime();
+    if (d >= todayStart.getTime())         groups["Hoy"]!.push(c);
+    else if (d >= yesterdayStart.getTime()) groups["Ayer"]!.push(c);
+    else if (d >= weekStart.getTime())      groups["Esta semana"]!.push(c);
+    else                                    groups["Anteriores"]!.push(c);
+  }
+
+  const activeId = activePath.startsWith("/chat")
+    ? new URLSearchParams(activePath.split("?")[1] ?? "").get("id") ?? ""
+    : "";
+
+  return Object.entries(groups)
+    .filter(([, items]) => items.length > 0)
+    .map(([label, items]) => ({
+      label,
+      conversations: items.map((c) => ({
+        id: c.id,
+        title: c.first_message?.slice(0, 48) ?? "Conversación",
+        active: c.id === activeId,
+      })),
+    }));
+}
+
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { newConversation } = useChatStore();
+  const { newConversation, conversationId } = useChatStore();
   const { clearCards } = useRightPanelStore();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
 
-  const groups: ConvGroup[] = []; // Will be populated from API
+  // Reload on every mount — ensures history is fresh after navigating back from a module.
+  // Zustand singletons don't re-trigger effects on navigation; useEffect with [] does.
+  useEffect(() => {
+    getConversations().then(setConversations).catch(() => {});
+  }, []);
+
+  const groups = groupConversations(conversations, pathname + (typeof window !== "undefined" ? window.location.search : ""));
 
   function handleNewConv() {
     newConversation();

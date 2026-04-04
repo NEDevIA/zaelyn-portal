@@ -36,8 +36,32 @@ export async function validateInviteCode(code: string) {
 }
 
 // Conversation history
-export async function getConversations() {
-  return [];
+export interface ConversationSummary {
+  id: string;
+  first_message: string | null;
+  last_message: string | null;
+  message_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getConversations(): Promise<ConversationSummary[]> {
+  const res = await fetch("/api/portal/conversations", { cache: "no-store" });
+  if (!res.ok) return [];
+  const data = await res.json() as { conversations?: ConversationSummary[] };
+  return data.conversations ?? [];
+}
+
+export async function getConversationMessages(
+  conversationId: string
+): Promise<{ id: string; role: string; content: string; created_at: string }[]> {
+  const res = await fetch(
+    `/api/portal/conversations/${encodeURIComponent(conversationId)}/messages`,
+    { cache: "no-store" }
+  );
+  if (!res.ok) return [];
+  const data = await res.json() as { messages?: { id: string; role: string; content: string; created_at: string }[] };
+  return data.messages ?? [];
 }
 
 // Telegram linking
