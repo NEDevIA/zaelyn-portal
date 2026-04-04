@@ -9,12 +9,21 @@ interface TurnAIProps {
 
 export default function TurnAI({ message, isPhantom, onChipClick }: TurnAIProps) {
   return (
-    <div className="px-6 py-1 flex flex-col gap-2.5">
+    <div className="px-4 flex flex-col gap-2">
+      {/* Zaelyn label */}
       <p
-        className="text-[16px] leading-relaxed"
+        className="text-[11px] font-medium tracking-wide"
+        style={{ color: "var(--muted-foreground)", opacity: 0.45 }}
+      >
+        Zaelyn
+      </p>
+
+      <p
+        className="zaelyn-message text-[14px] leading-[1.75]"
         style={{
           color: "var(--foreground)",
-          fontFamily: "var(--font-dm-serif)",
+          fontFamily: "var(--font-dm-sans)",
+          whiteSpace: "pre-wrap",
         }}
       >
         {message.content}
@@ -24,7 +33,7 @@ export default function TurnAI({ message, isPhantom, onChipClick }: TurnAIProps)
       </p>
 
       {!isPhantom && message.chips && message.chips.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mt-1">
           {message.chips.map((chip) => (
             <ModuleChip
               key={chip.cardId}

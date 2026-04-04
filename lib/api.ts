@@ -36,8 +36,36 @@ export async function validateInviteCode(code: string) {
 }
 
 // Conversation history
-export async function getConversations() {
-  return [];
+export interface ConversationSummary {
+  id: string;
+  first_message: string;
+  updated_at: string;
+  title?: string; // custom rename persisted in backend
+}
+
+export async function getConversations(): Promise<ConversationSummary[]> {
+  try {
+    const res = await fetch("/api/portal/conversations", { cache: "no-store" });
+    if (!res.ok) return [];
+    const data = await res.json() as { conversations?: ConversationSummary[] };
+    return data.conversations ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function renameConversation(id: string, title: string): Promise<void> {
+  await fetch(`/api/portal/conversations/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title }),
+  });
+}
+
+export async function deleteConversation(id: string): Promise<void> {
+  await fetch(`/api/portal/conversations/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
 }
 
 // Telegram linking

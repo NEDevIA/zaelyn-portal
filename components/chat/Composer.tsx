@@ -42,17 +42,16 @@ export default function Composer({ onSend, isStreaming, onStop, isPhantom, disab
     : "Escribe, pregunta, o piensa en voz alta...";
 
   return (
-    <div
-      className="px-4 pb-4 pt-2"
-      style={{ borderTop: "1px solid var(--border)" }}
-    >
+    <div className="px-4 pb-5 pt-2">
+      <div style={{ maxWidth: "760px", margin: "0 auto", width: "100%" }}>
       <div
-        className="flex items-end gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+        className="flex items-end gap-3 px-4 py-3 rounded-2xl transition-all duration-200"
         style={{
           background: "var(--card)",
           border: isPhantom
             ? "1px solid rgba(139,92,246,0.3)"
             : "1px solid var(--border)",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
         }}
       >
         <textarea
@@ -109,6 +108,7 @@ export default function Composer({ onSend, isStreaming, onStop, isPhantom, disab
           ? "Phantom activo ◈ — esta sesión no existe en ningún servidor"
           : "Sovereign — sin logs · Enter para enviar · Shift+Enter para nueva línea"}
       </p>
+      </div>
     </div>
   );
 }

@@ -1,19 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Plus, ChatsCircle, CaretDown } from "@phosphor-icons/react";
+import { Plus, ChatsCircle, CaretDown, PencilSimple, Trash } from "@phosphor-icons/react";
 import { useChatStore } from "@/store/useChatStore";
 import { useRightPanelStore } from "@/store/useRightPanelStore";
-import { getConversations, type ConversationSummary } from "@/lib/api";
+import { getConversations, renameConversation, deleteConversation, type ConversationSummary } from "@/lib/api";
 
+// Tu red removed — will appear when Pulsar is implemented
 const MODULES = [
-  { id: "aura",    label: "Tu aura",     color: "#8b5cf6", path: "/aura" },
-  { id: "sirius",  label: "Tu memoria",  color: "#7c3aed", path: "/sirius" },
-  { id: "orion",   label: "Tus tareas",  color: "#3b82f6", path: "/orion" },
-  { id: "polaris", label: "Tus metas",   color: "#10b981", path: "/polaris" },
-  { id: "pulsar",  label: "Tu red",      color: "#e879f9", path: "/pulsar" },
+  { id: "aura",    label: "Tu aura",    color: "#8b5cf6", path: "/aura" },
+  { id: "sirius",  label: "Tu memoria", color: "#7c3aed", path: "/sirius" },
+  { id: "orion",   label: "Tus tareas", color: "#3b82f6", path: "/orion" },
+  { id: "polaris", label: "Tus metas",  color: "#10b981", path: "/polaris" },
 ];
 
 type ConvGroup = { label: string; conversations: { id: string; title: string; active?: boolean }[] };
@@ -24,7 +24,6 @@ function groupConversations(
 ): ConvGroup[] {
   if (convs.length === 0) return [];
 
-  const now = Date.now();
   const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
   const yesterdayStart = new Date(todayStart); yesterdayStart.setDate(yesterdayStart.getDate() - 1);
   const weekStart = new Date(todayStart); weekStart.setDate(weekStart.getDate() - 7);
@@ -38,7 +37,7 @@ function groupConversations(
 
   for (const c of convs) {
     const d = new Date(c.updated_at).getTime();
-    if (d >= todayStart.getTime())         groups["Hoy"]!.push(c);
+    if (d >= todayStart.getTime())          groups["Hoy"]!.push(c);
     else if (d >= yesterdayStart.getTime()) groups["Ayer"]!.push(c);
     else if (d >= weekStart.getTime())      groups["Esta semana"]!.push(c);
     else                                    groups["Anteriores"]!.push(c);
@@ -54,11 +53,159 @@ function groupConversations(
       label,
       conversations: items.map((c) => ({
         id: c.id,
-        title: c.first_message?.slice(0, 48) ?? "Conversación",
+        title: c.title ?? c.first_message?.slice(0, 48) ?? "Conversación",
         active: c.id === activeId,
       })),
     }));
 }
+
+// ── ConvItem — individual conversation row with hover actions ─────────────────
+function ConvItem({
+  conv,
+  onRenamed,
+  onDeleted,
+}: {
+  conv: { id: string; title: string; active?: boolean };
+  onRenamed: (id: string, title: string) => void;
+  onDeleted: (id: string) => void;
+}) {
+  const router = useRouter();
+  const [hovered, setHovered] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editValue, setEditValue] = useState(conv.title);
+  const [confirming, setConfirming] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function startEdit(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditValue(conv.title);
+    setEditing(true);
+    setTimeout(() => inputRef.current?.select(), 0);
+  }
+
+  async function saveEdit() {
+    const trimmed = editValue.trim();
+    if (trimmed && trimmed !== conv.title) {
+      await renameConversation(conv.id, trimmed);
+      onRenamed(conv.id, trimmed);
+    }
+    setEditing(false);
+  }
+
+  function cancelEdit() {
+    setEditing(false);
+    setEditValue(conv.title);
+  }
+
+  function startDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setConfirming(true);
+  }
+
+  async function confirmDelete() {
+    await deleteConversation(conv.id);
+    onDeleted(conv.id);
+    if (conv.active) router.push("/chat");
+  }
+
+  if (editing) {
+    return (
+      <div className="px-2 py-1">
+        <input
+          ref={inputRef}
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") saveEdit();
+            if (e.key === "Escape") cancelEdit();
+          }}
+          onBlur={saveEdit}
+          className="w-full px-2 py-1 rounded-md text-[12px] outline-none"
+          style={{
+            background: "var(--card)",
+            border: "1px solid rgba(99,102,241,0.4)",
+            color: "var(--foreground)",
+            fontFamily: "var(--font-dm-sans)",
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (confirming) {
+    return (
+      <div
+        className="px-2 py-1.5 rounded-lg flex items-center gap-1"
+        style={{ background: "rgba(239,68,68,0.06)" }}
+      >
+        <span className="text-[11px] flex-1" style={{ color: "var(--muted-foreground)" }}>
+          ¿Borrar?
+        </span>
+        <button
+          onClick={confirmDelete}
+          className="text-[11px] px-1.5 py-0.5 rounded font-medium"
+          style={{ color: "#ef4444", background: "rgba(239,68,68,0.1)" }}
+        >
+          Sí
+        </button>
+        <button
+          onClick={() => setConfirming(false)}
+          className="text-[11px] px-1.5 py-0.5 rounded"
+          style={{ color: "var(--muted-foreground)" }}
+        >
+          No
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="relative group"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <Link
+        href={`/chat?id=${conv.id}`}
+        className="block px-2 py-1.5 rounded-lg text-[12px] truncate transition-colors duration-100 pr-14"
+        style={{
+          color: conv.active ? "var(--foreground)" : "var(--muted-foreground)",
+          background: conv.active ? "var(--card)" : "transparent",
+        }}
+      >
+        {conv.title}
+      </Link>
+
+      {hovered && (
+        <div
+          className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5"
+          style={{ background: conv.active ? "var(--card)" : "var(--background)" }}
+        >
+          <button
+            onClick={startEdit}
+            className="w-5 h-5 flex items-center justify-center rounded transition-colors duration-100"
+            style={{ color: "var(--muted-foreground)" }}
+            title="Renombrar"
+          >
+            <PencilSimple size={11} />
+          </button>
+          <button
+            onClick={startDelete}
+            className="w-5 h-5 flex items-center justify-center rounded transition-colors duration-100"
+            style={{ color: "var(--muted-foreground)" }}
+            title="Borrar"
+          >
+            <Trash size={11} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -68,13 +215,14 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
 
-  // Re-fetch whenever a new conversation is started so the sidebar stays in sync.
-  // conversationId changes each time newConversation() is called, which triggers this effect.
   useEffect(() => {
     getConversations().then(setConversations).catch(() => {});
   }, [conversationId]);
 
-  const groups = groupConversations(conversations, pathname + (typeof window !== "undefined" ? window.location.search : ""));
+  const groups = groupConversations(
+    conversations,
+    pathname + (typeof window !== "undefined" ? window.location.search : "")
+  );
 
   function handleNewConv() {
     newConversation();
@@ -84,6 +232,16 @@ export default function Sidebar() {
 
   function toggleGroup(label: string) {
     setCollapsed((s) => ({ ...s, [label]: !s[label] }));
+  }
+
+  function handleRenamed(id: string, title: string) {
+    setConversations((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, title } : c))
+    );
+  }
+
+  function handleDeleted(id: string) {
+    setConversations((prev) => prev.filter((c) => c.id !== id));
   }
 
   return (
@@ -145,17 +303,12 @@ export default function Sidebar() {
               {!collapsed[group.label] && (
                 <div className="flex flex-col gap-0.5">
                   {group.conversations.map((conv) => (
-                    <Link
+                    <ConvItem
                       key={conv.id}
-                      href={`/chat?id=${conv.id}`}
-                      className="block px-2 py-1.5 rounded-lg text-[12px] truncate transition-colors duration-100"
-                      style={{
-                        color: conv.active ? "var(--foreground)" : "var(--muted-foreground)",
-                        background: conv.active ? "var(--card)" : "transparent",
-                      }}
-                    >
-                      {conv.title}
-                    </Link>
+                      conv={conv}
+                      onRenamed={handleRenamed}
+                      onDeleted={handleDeleted}
+                    />
                   ))}
                 </div>
               )}
