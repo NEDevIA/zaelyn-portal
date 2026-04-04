@@ -73,7 +73,7 @@ export default function Pricing({ lang }: { lang: LandingLang }) {
                   </div>
                 ))}
               </div>
-              <Link href="/join" style={{
+              <Link href="/login" style={{
                 display: "block", textAlign: "center",
                 padding: "12px", borderRadius: "10px",
                 background: plan.featured ? "linear-gradient(135deg, var(--z-violet), var(--z-cyan))" : "var(--l-surface2)",

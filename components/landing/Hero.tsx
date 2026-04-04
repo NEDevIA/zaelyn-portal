@@ -91,7 +91,7 @@ export default function Hero({ lang }: HeroProps) {
 
       {/* CTAs */}
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center", marginBottom: "80px", animation: "fadeUp .8s ease .3s both" }}>
-        <Link href="/join" style={{
+        <Link href="/login" style={{
           padding: "14px 28px", borderRadius: "12px",
           background: "linear-gradient(135deg, var(--z-violet), var(--z-cyan))",
           color: "#fff", fontSize: "15px", fontWeight: 600,

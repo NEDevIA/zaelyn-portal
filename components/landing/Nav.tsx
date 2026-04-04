@@ -100,7 +100,7 @@ export default function Nav({ lang, onLangChange }: NavProps) {
           {theme === "dark" ? "🌙" : "☀️"}
         </button>
 
-        <Link href="/join" style={{
+        <Link href="/login" style={{
           padding: "9px 20px", borderRadius: "9px",
           background: "linear-gradient(135deg, var(--z-violet), var(--z-cyan))",
           color: "#fff", fontSize: "14px", fontWeight: 600,
