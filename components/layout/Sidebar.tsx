@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Plus, ChatsCircle, CaretDown, PencilSimple, Trash } from "@phosphor-icons/react";
 import { useChatStore } from "@/store/useChatStore";
 import { useRightPanelStore } from "@/store/useRightPanelStore";
@@ -20,7 +20,7 @@ type ConvGroup = { label: string; conversations: { id: string; title: string; ac
 
 function groupConversations(
   convs: ConversationSummary[],
-  activePath: string
+  activeId: string
 ): ConvGroup[] {
   if (convs.length === 0) return [];
 
@@ -43,10 +43,6 @@ function groupConversations(
     else                                    groups["Anteriores"]!.push(c);
   }
 
-  const activeId = activePath.startsWith("/chat")
-    ? new URLSearchParams(activePath.split("?")[1] ?? "").get("id") ?? ""
-    : "";
-
   return Object.entries(groups)
     .filter(([, items]) => items.length > 0)
     .map(([label, items]) => ({
@@ -64,10 +60,12 @@ function ConvItem({
   conv,
   onRenamed,
   onDeleted,
+  onNavigate,
 }: {
   conv: { id: string; title: string; active?: boolean };
   onRenamed: (id: string, title: string) => void;
   onDeleted: (id: string) => void;
+  onNavigate: (id: string) => void;
 }) {
   const router = useRouter();
   const [hovered, setHovered] = useState(false);
@@ -169,6 +167,7 @@ function ConvItem({
     >
       <Link
         href={`/chat?id=${conv.id}`}
+        onClick={() => onNavigate(conv.id)}
         className="block px-2 py-1.5 rounded-lg text-[12px] truncate transition-colors duration-100 pr-14"
         style={{
           color: conv.active ? "var(--foreground)" : "var(--muted-foreground)",
@@ -209,20 +208,21 @@ function ConvItem({
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const { newConversation, conversationId } = useChatStore();
+  const { newConversation, conversationId, loadConversation } = useChatStore();
   const { clearCards } = useRightPanelStore();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
+
+  // Active conversation comes from URL search params (reactive to navigation)
+  const activeId = pathname === "/chat" ? (searchParams.get("id") ?? "") : "";
 
   useEffect(() => {
     getConversations().then(setConversations).catch(() => {});
   }, [conversationId]);
 
-  const groups = groupConversations(
-    conversations,
-    pathname + (typeof window !== "undefined" ? window.location.search : "")
-  );
+  const groups = groupConversations(conversations, activeId);
 
   function handleNewConv() {
     newConversation();
@@ -242,6 +242,13 @@ export default function Sidebar() {
 
   function handleDeleted(id: string) {
     setConversations((prev) => prev.filter((c) => c.id !== id));
+  }
+
+  // Called when user clicks a conversation — load immediately without waiting for URL effect
+  function handleConvNavigate(id: string) {
+    if (id !== activeId) {
+      loadConversation(id);
+    }
   }
 
   return (
@@ -308,6 +315,7 @@ export default function Sidebar() {
                       conv={conv}
                       onRenamed={handleRenamed}
                       onDeleted={handleDeleted}
+                      onNavigate={handleConvNavigate}
                     />
                   ))}
                 </div>

@@ -59,10 +59,20 @@ export default function ChatPage() {
 
   const [firstMsgData, setFirstMsgData] = useState<FirstMessageData | null>(null);
 
-  // If URL has ?id=, load that conversation; otherwise ensure a fresh one exists
+  // If URL has ?id=, load that conversation; otherwise ensure a fresh one exists.
+  // This handles direct URL access, page refresh, and browser back/forward navigation.
+  // Sidebar click also calls loadConversation directly for instant response.
+  const prevUrlConvId = useRef<string | null | undefined>(undefined);
   useEffect(() => {
+    // Only act if urlConvId actually changed (avoid double-load on initial render)
+    if (prevUrlConvId.current === urlConvId) return;
+    prevUrlConvId.current = urlConvId;
+
     if (urlConvId) {
-      loadConversation(urlConvId);
+      // Only load from backend if this is a different conversation than what's already shown
+      if (conversationId !== urlConvId) {
+        loadConversation(urlConvId);
+      }
     } else if (!conversationId) {
       newConversation();
     }
