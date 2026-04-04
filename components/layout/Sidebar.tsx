@@ -68,11 +68,11 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
 
-  // Reload on every mount — ensures history is fresh after navigating back from a module.
-  // Zustand singletons don't re-trigger effects on navigation; useEffect with [] does.
+  // Re-fetch whenever a new conversation is started so the sidebar stays in sync.
+  // conversationId changes each time newConversation() is called, which triggers this effect.
   useEffect(() => {
     getConversations().then(setConversations).catch(() => {});
-  }, []);
+  }, [conversationId]);
 
   const groups = groupConversations(conversations, pathname + (typeof window !== "undefined" ? window.location.search : ""));
 
