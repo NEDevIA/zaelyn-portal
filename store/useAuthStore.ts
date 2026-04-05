@@ -4,6 +4,7 @@ export interface ZaelynUser {
   id: string;
   email: string;
   name?: string;
+  city?: string;
   plan: "beta" | "free" | "pro" | "enterprise";
   persona?: string;
   privacyMode?: "comfort" | "sovereign" | "phantom" | "full_sovereign";

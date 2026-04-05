@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { Ghost, ShieldCheck, Eye, Lock, Check } from "@phosphor-icons/react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { usePersonaStore } from "@/store/usePersonaStore";
@@ -106,28 +105,36 @@ const PRIVACY_OPTIONS: {
 
 // ── Section save feedback ────────────────────────────────────────────────────
 
-type SavingSection = "persona" | "model" | "briefing" | "privacy" | null;
+type SavingSection = "persona" | "model" | "briefing" | "privacy" | "profile" | null;
 
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
-  const router = useRouter();
   const { user, setUser } = useAuthStore();
   const {
     personaId,
     briefingEnabled,
     briefingTime,
-    tone,
     isLoaded,
     setPersona,
     loadPersona,
   } = usePersonaStore();
 
   const [savingSection, setSavingSection] = useState<SavingSection>(null);
+  const [editName, setEditName] = useState("");
+  const [editCity, setEditCity] = useState("");
 
   useEffect(() => {
     if (!isLoaded) loadPersona();
   }, [isLoaded, loadPersona]);
+
+  // Sync editable fields when user loads
+  useEffect(() => {
+    if (user) {
+      setEditName(user.name ?? "");
+      setEditCity(user.city ?? "");
+    }
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const flashSave = useCallback((section: SavingSection) => {
     setSavingSection(section);
@@ -183,6 +190,25 @@ export default function SettingsPage() {
     flashSave("privacy");
   }
 
+  async function handleProfileSave() {
+    if (!user) return;
+    const nameChanged = editName.trim() && editName.trim() !== user.name;
+    const cityChanged = editCity.trim() !== (user.city ?? "");
+    if (!nameChanged && !cityChanged) return;
+
+    const payload: { display_name?: string; city?: string } = {};
+    if (nameChanged) payload.display_name = editName.trim();
+    if (cityChanged) payload.city = editCity.trim();
+
+    await updateUser(payload);
+    setUser({
+      ...user,
+      ...(nameChanged ? { name: editName.trim() } : {}),
+      ...(cityChanged ? { city: editCity.trim() } : {}),
+    });
+    flashSave("profile");
+  }
+
   if (!user) return null;
 
   // ── Render ───────────────────────────────────────────────────────────────────
@@ -203,59 +229,97 @@ export default function SettingsPage() {
 
         {/* ── SECTION 1: PERFIL ────────────────────────────────────────────── */}
         <section className="mb-10">
-          <p
-            className="text-[11px] font-semibold tracking-widest mb-4 uppercase"
-            style={{ color: "var(--muted-foreground)" }}
-          >
-            Perfil
-          </p>
+          <div className="flex items-center justify-between mb-4">
+            <p
+              className="text-[11px] font-semibold tracking-widest uppercase"
+              style={{ color: "var(--muted-foreground)" }}
+            >
+              Perfil
+            </p>
+            {savingSection === "profile" && (
+              <span className="flex items-center gap-1 text-[12px]" style={{ color: "#10b981" }}>
+                <Check size={12} weight="bold" />
+                Guardado
+              </span>
+            )}
+          </div>
 
           <div
-            className="rounded-2xl p-6 flex items-center gap-5"
-            style={{
-              background: "var(--card)",
-              border: "1px solid var(--border)",
-            }}
+            className="rounded-2xl overflow-hidden"
+            style={{ background: "var(--card)", border: "1px solid var(--border)" }}
           >
-            {/* Avatar */}
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center text-[18px] font-semibold flex-shrink-0"
-              style={{
-                background: avatarStyle.bg,
-                color: avatarStyle.color,
-                border: `1.5px solid ${avatarStyle.color}33`,
-              }}
-            >
-              {initials}
+            {/* Avatar row */}
+            <div className="p-6 flex items-center gap-5" style={{ borderBottom: "1px solid var(--border)" }}>
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center text-[18px] font-semibold flex-shrink-0"
+                style={{
+                  background: avatarStyle.bg,
+                  color: avatarStyle.color,
+                  border: `1.5px solid ${avatarStyle.color}33`,
+                }}
+              >
+                {initials}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[13px] truncate" style={{ color: "var(--muted-foreground)" }}>
+                  {user.email}
+                </div>
+                <div className="mt-1.5">
+                  <span
+                    className="text-[11px] px-2 py-0.5 rounded-full font-medium capitalize"
+                    style={{ background: "rgba(99,102,241,0.1)", color: "#818cf8" }}
+                  >
+                    {user.plan}
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <div className="flex-1 min-w-0">
-              {/* Name */}
-              <div
-                className="text-[14px] font-medium mb-1 truncate"
-                style={{ color: "var(--foreground)" }}
-              >
-                {user.name ?? "—"}
-              </div>
-              {/* Email */}
-              <div
-                className="text-[13px] truncate"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                {user.email}
-              </div>
-              {/* Plan badge */}
-              <div className="mt-2">
-                <span
-                  className="text-[11px] px-2 py-0.5 rounded-full font-medium capitalize"
-                  style={{
-                    background: "rgba(99,102,241,0.1)",
-                    color: "#818cf8",
-                  }}
-                >
-                  {user.plan}
-                </span>
-              </div>
+            {/* Nombre */}
+            <div className="px-6 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
+              <label className="block text-[11px] font-medium mb-2" style={{ color: "var(--muted-foreground)" }}>
+                Nombre
+              </label>
+              <input
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                onBlur={handleProfileSave}
+                onKeyDown={(e) => e.key === "Enter" && (e.currentTarget as HTMLInputElement).blur()}
+                placeholder="Tu nombre"
+                className="w-full px-3 py-2 rounded-lg text-[13px] outline-none transition-colors duration-150"
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid var(--border)",
+                  color: "var(--foreground)",
+                }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(99,102,241,0.4)"; }}
+              />
+            </div>
+
+            {/* Ciudad */}
+            <div className="px-6 py-4">
+              <label className="block text-[11px] font-medium mb-2" style={{ color: "var(--muted-foreground)" }}>
+                Ciudad
+              </label>
+              <input
+                type="text"
+                value={editCity}
+                onChange={(e) => setEditCity(e.target.value)}
+                onBlur={handleProfileSave}
+                onKeyDown={(e) => e.key === "Enter" && (e.currentTarget as HTMLInputElement).blur()}
+                placeholder="Tu ciudad (actualiza el horario del briefing)"
+                className="w-full px-3 py-2 rounded-lg text-[13px] outline-none transition-colors duration-150"
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid var(--border)",
+                  color: "var(--foreground)",
+                }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(99,102,241,0.4)"; }}
+              />
+              <p className="text-[11px] mt-1.5" style={{ color: "var(--muted-foreground)", opacity: 0.6 }}>
+                Ej: Houston, Ciudad de México, Bogotá — el timezone se detecta automáticamente.
+              </p>
             </div>
           </div>
         </section>

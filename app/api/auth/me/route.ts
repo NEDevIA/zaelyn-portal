@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
   let privacyMode: string = "sovereign";
   let preferredModel: string = "fast";
   let displayName: string = email.split("@")[0].replace(/[._]/g, " ");
+  let city: string | undefined;
 
   try {
     const res = await fetch(`${BACKEND}/api/v1/portal/user`, {
@@ -38,8 +39,9 @@ export async function GET(req: NextRequest) {
       if (user["privacy_mode"]) privacyMode = user["privacy_mode"] as string;
       // Preferences stored in metadata JSONB
       const meta = user["metadata"] as Record<string, unknown> | undefined;
-      if (meta?.["privacy_level"]) privacyMode     = meta["privacy_level"] as string;
+      if (meta?.["privacy_level"])   privacyMode    = meta["privacy_level"] as string;
       if (meta?.["preferred_model"]) preferredModel = meta["preferred_model"] as string;
+      if (meta?.["city"])            city           = meta["city"] as string;
     }
   } catch {
     // Backend unavailable — return safe defaults
@@ -49,6 +51,7 @@ export async function GET(req: NextRequest) {
     id:             Buffer.from(email).toString("base64"),
     email,
     name:           displayName,
+    city,
     plan,
     persona,
     privacyMode,

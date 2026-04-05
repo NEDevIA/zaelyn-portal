@@ -153,6 +153,7 @@ export async function updateUser(data: {
   preferred_model?: "fast" | "smart";
   privacy_level?: "comfort" | "sovereign" | "phantom" | "full_sovereign";
   display_name?: string;
+  city?: string;
 }) {
   const res = await fetch("/api/portal/user", {
     method: "PATCH",
