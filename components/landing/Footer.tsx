@@ -28,10 +28,10 @@ export default function Footer({ lang }: { lang: LandingLang }) {
       { labelKey: "footer.press", href: "#" },
     ]},
     { groupKey: "footer.legal", items: [
-      { labelKey: "footer.privacy", href: "#" },
-      { labelKey: "footer.terms", href: "#" },
-      { labelKey: "footer.cookies", href: "#" },
-      { labelKey: "footer.data", href: "#" },
+      { labelKey: "footer.privacy", href: "/legal?tab=privacy" },
+      { labelKey: "footer.terms",   href: "/legal?tab=terms" },
+      { labelKey: "footer.cookies", href: "/legal?tab=cookies" },
+      { labelKey: "footer.data",    href: "/legal?tab=data" },
     ]},
   ];
 
