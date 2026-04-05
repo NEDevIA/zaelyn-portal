@@ -17,12 +17,14 @@ export async function GET(req: NextRequest) {
   const email = payload.email;
 
   // Fetch real user profile from backend to get plan, display_name, metadata prefs
+  let realId: string = Buffer.from(email).toString("base64"); // fallback until backend responds
   let plan: string = "beta";
   let persona: string = "sabia";
   let privacyMode: string = "sovereign";
   let preferredModel: string = "fast";
   let displayName: string = email.split("@")[0].replace(/[._]/g, " ");
   let city: string | undefined;
+  let locale: string | undefined;
 
   try {
     const res = await fetch(`${BACKEND}/api/v1/portal/user`, {
@@ -34,6 +36,8 @@ export async function GET(req: NextRequest) {
     });
     if (res.ok) {
       const { user } = await res.json() as { user: Record<string, unknown> };
+      // Use the real Supabase UUID — never the base64 fallback when backend is reachable.
+      if (user["id"])           realId      = user["id"] as string;
       if (user["plan"])         plan        = user["plan"] as string;
       if (user["display_name"]) displayName = user["display_name"] as string;
       if (user["privacy_mode"]) privacyMode = user["privacy_mode"] as string;
@@ -42,16 +46,18 @@ export async function GET(req: NextRequest) {
       if (meta?.["privacy_level"])   privacyMode    = meta["privacy_level"] as string;
       if (meta?.["preferred_model"]) preferredModel = meta["preferred_model"] as string;
       if (meta?.["city"])            city           = meta["city"] as string;
+      if (meta?.["locale"])          locale         = meta["locale"] as string;
     }
   } catch {
-    // Backend unavailable — return safe defaults
+    // Backend unavailable — return safe defaults with fallback id
   }
 
   return NextResponse.json({
-    id:             Buffer.from(email).toString("base64"),
+    id:             realId,
     email,
     name:           displayName,
     city,
+    locale,
     plan,
     persona,
     privacyMode,

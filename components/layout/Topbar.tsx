@@ -127,6 +127,12 @@ export default function Topbar() {
     await updateUser({ privacy_level: level });
   }
 
+  async function handleLangSelect(l: Lang) {
+    setLang(l); // updates localStorage immediately
+    if (user) setUser({ ...user, locale: l });
+    await updateUser({ locale: l }); // fire-and-forget persist to DB
+  }
+
   const initials = user?.name
     ? user.name
         .split(" ")
@@ -327,7 +333,7 @@ export default function Topbar() {
         {(["es", "en", "pt"] as Lang[]).map((l) => (
           <button
             key={l}
-            onClick={() => setLang(l)}
+            onClick={() => handleLangSelect(l)}
             className="px-2.5 py-1 text-[10px] font-medium tracking-widest transition-all duration-150"
             style={{
               color: lang === l ? "#fff" : "var(--muted-foreground)",

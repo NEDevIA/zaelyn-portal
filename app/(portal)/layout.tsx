@@ -7,12 +7,15 @@ import Sidebar from "@/components/layout/Sidebar";
 import RightPanel from "@/components/layout/RightPanel";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useChatStore } from "@/store/useChatStore";
+import { useLanguageStore } from "@/store/useLanguageStore";
 import { getMe } from "@/lib/api";
+import type { Lang } from "@/lib/i18n";
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { setUser, clearUser, setHydrated } = useAuthStore();
   const setPrivacyMode = useChatStore((s) => s.setPrivacyMode);
+  const setLang = useLanguageStore((s) => s.setLang);
 
   useEffect(() => {
     getMe()
@@ -20,6 +23,10 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         if (user?.id) {
           setUser(user);
           if (user.privacyMode) setPrivacyMode(user.privacyMode);
+          // DB locale takes precedence over localStorage on every login.
+          if (user.locale && ["es", "en", "pt"].includes(user.locale)) {
+            setLang(user.locale as Lang);
+          }
         } else {
           clearUser();
           router.replace("/login");

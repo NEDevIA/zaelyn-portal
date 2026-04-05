@@ -154,6 +154,7 @@ export async function updateUser(data: {
   privacy_level?: "comfort" | "sovereign" | "phantom" | "full_sovereign";
   display_name?: string;
   city?: string;
+  locale?: string;
 }) {
   const res = await fetch("/api/portal/user", {
     method: "PATCH",
