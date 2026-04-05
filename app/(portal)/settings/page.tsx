@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Ghost, ShieldCheck, Eye, Lock, Check } from "@phosphor-icons/react";
+import { useChatStore } from "@/store/useChatStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { usePersonaStore } from "@/store/usePersonaStore";
 import { updateUser, updatePersona } from "@/lib/api";
@@ -65,7 +66,7 @@ const PERSONAS = [
 
 // ── Privacy options ───────────────────────────────────────────────────────────
 
-type PrivacyLevel = "comfort" | "sovereign" | "full_sovereign";
+type PrivacyLevel = "comfort" | "sovereign" | "full_sovereign" | "phantom";
 
 const PRIVACY_OPTIONS: {
   value: PrivacyLevel;
@@ -101,6 +102,14 @@ const PRIVACY_OPTIONS: {
     color: "#6366f1",
     disabled: true,
   },
+  {
+    value: "phantom",
+    icon: <Ghost size={16} weight="fill" />,
+    label: "Phantom",
+    badge: "Todos los planes",
+    description: "Sin análisis, sin historial. Solo guardas lo que pides explícitamente.",
+    color: "#a78bfa",
+  },
 ];
 
 // ── Section save feedback ────────────────────────────────────────────────────
@@ -119,6 +128,7 @@ export default function SettingsPage() {
     setPersona,
     loadPersona,
   } = usePersonaStore();
+  const setPrivacyMode = useChatStore((s) => s.setPrivacyMode);
 
   const [savingSection, setSavingSection] = useState<SavingSection>(null);
   const [editName, setEditName] = useState("");
@@ -186,6 +196,7 @@ export default function SettingsPage() {
   async function handlePrivacySelect(level: PrivacyLevel) {
     if (!user) return;
     setUser({ ...user, privacyMode: level });
+    setPrivacyMode(level);
     await updateUser({ privacy_level: level });
     flashSave("privacy");
   }
@@ -560,8 +571,7 @@ export default function SettingsPage() {
             }}
           >
             {PRIVACY_OPTIONS.map((opt, idx) => {
-              const isSelected =
-                currentPrivacy !== "phantom" && currentPrivacy === opt.value;
+              const isSelected = currentPrivacy === opt.value;
 
               return (
                 <button
@@ -616,33 +626,6 @@ export default function SettingsPage() {
               );
             })}
 
-            {/* Phantom mode note */}
-            <div
-              className="px-5 py-4"
-              style={{ borderTop: "1px solid var(--border)" }}
-            >
-              <div className="flex items-start gap-3">
-                <Ghost
-                  size={14}
-                  weight="fill"
-                  className="mt-0.5 flex-shrink-0"
-                  style={{ color: "#a78bfa" }}
-                />
-                <div>
-                  <p className="text-[12px]" style={{ color: "var(--muted-foreground)" }}>
-                    La gestión completa de Phantom Mode está en{" "}
-                    <a
-                      href="/me/privacidad"
-                      className="underline"
-                      style={{ color: "#a78bfa" }}
-                    >
-                      Privacidad
-                    </a>
-                    .
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
       </div>
